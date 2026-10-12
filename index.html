@@ -582,9 +582,15 @@ sheet(hdS(_("المنتج","Product","Produit"))+'<input placeholder="'+_("اس�
 (p.mode=="paid"?'<div class="okb" style="margin-top:8px">'+_("يُشفَّر الملف/الرابط داخل صفحتك، ولا يفتح إلا بكود تفعيل تعطيه للمشتري بعد الدفع.","The file/link is encrypted inside your page and opens only with an activation code you give after payment.","Le fichier/lien est chiffré dans votre page et ne s'ouvre qu'avec un code d'activation donné après paiement.")+'</div>'+seg(p.src.type,[["url","🔗 "+_("رابط خارجي","External link","Lien externe")],["file","📎 "+_("ملف (≤3MB)","File (≤3MB)","Fichier (≤3 Mo)")]],"X.pSrc")+(p.src.type=="url"?'<input dir="ltr" placeholder="https://drive.google.com/…" value="'+esc(p.src.url)+'" oninput="P.src.url=this.value">':'<label class="up">'+(p.src.fn?"✅ "+esc(p.src.fn):"📎 "+_("اختر الملف","Choose file","Choisir un fichier"))+'<input type="file" hidden onchange="X.pSrcFile(this.files[0])"></label>')+(p.lm?'<div class="mu" style="margin-top:6px">🔒 '+_("مقفول","Locked","Verrouillé")+' — '+p.lm.codes.filter(c=>!c.used).length+' '+_("كود متاح (غيّر الرابط/الملف لإنشاء قفل جديد)","free codes (changing the link/file creates a new lock)","codes libres (changer le lien/fichier crée un nouveau verrou)")+'</div>':'<label class="l">'+_("عدد أكواد التفعيل المراد إنشاؤها","Number of activation codes to create","Nombre de codes d'activation à créer")+'</label><input type="number" min="1" max="60" value="'+(p.nc||10)+'" oninput="P.nc=this.value">'):"")+
 '<button class="btn w" style="margin-top:12px" onclick="X.saveP()">'+_("حفظ","Save","Enregistrer")+'</button>')}
 /* ---------- boot ---------- */
+</script>
+<script src="config.js"></script>
+<script src="supabase.min.js"></script>
+<script src="cloud.js"></script>
+<script>
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;if(S)render()});
 (async()=>{lang=Math.max(0,LG.indexOf(localStorage.getItem("rb_authlang")||"ar"));document.documentElement.setAttribute("data-theme",ui());
 $("#dk").onclick=toggleDark;$("#lg").onclick=()=>{S.lang=LG[(lang+1)%3];save();render()};$("#inst").onclick=X.install;
+if(CLOUD.enabled){try{await CLOUD.init()}catch(e){CLOUD.auth('login');CLOUD.fail(e)}if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});return}
 accounts=(await idbGet("accounts"))||[];HASLEGACY=!!(await idbGet("state"));
 const sess=await idbGet("sess");let ok=false;
 if(sess&&sess.key){try{const acc=accounts.find(a=>a.id==sess.id);if(acc){ACC=acc;KEY=sess.key;const d=await idbGet("data:"+acc.id);S=d?norm0(JSON.parse(await decStr(d))):defaults();ok=true}}catch(e){ACC=null;KEY=null;S=null;await idbDel("sess")}}
