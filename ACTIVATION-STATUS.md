@@ -15,3 +15,7 @@ Redirect URLs: https://elkandoussi1.github.io/rabiti/index.html
 رابط public.html?store=ahmed مثال، ولا يعمل حتى إنشاء ونشر متجر بهذا الاسم.
 
 للوصول لبيانات الحساب المحلي القديم وتصديرها، افتح index.html?local=1.
+
+تحديث المنتجات المدفوعة: تم تطبيق rabiti_paid_delivery وrabiti_paid_delivery_hardening.
+تأكيد الدفع يدوي. الملف أو الرابط خاص، ويُسلّم بعد التفعيل بواسطة الخادم.
+راجع SECURITY-STATUS.md لنتائج الاختبار وحدود مشاركة الملفات بعد التسليم.

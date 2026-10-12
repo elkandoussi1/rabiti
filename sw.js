@@ -1,4 +1,4 @@
-const C="rabiti-v4-cloud", F=["./config.js","./supabase.min.js","./cloud.js","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png"];
+const C="rabiti-v5-paid", F=["./config.js","./supabase.min.js","./cloud.js","./paid-editor.js","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(C).then(c=>c.addAll(F)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>/^rabiti-v/.test(k)&&k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener("fetch",e=>{const q=e.request,u=new URL(q.url);if(q.method!=="GET"||u.origin!==self.location.origin)return;

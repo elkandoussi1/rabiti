@@ -102,7 +102,7 @@ if(tg.dataset.cp){copy(tg.dataset.cp,tg);return}
 if(tg.dataset.m!==undefined){sel=+tg.dataset.m;draw();return}
 if(tg.dataset.tg){copy(msg());window.open("https://t.me/"+String(SC.telegram).replace(/^@/,""),"_blank");return}
 if(tg.dataset.nav){var n=st+ +tg.dataset.nav;if(st==2&&n==3&&M.length&&!PU&&sel<0){tg.classList.add("sh");setTimeout(function(){tg.classList.remove("sh")},400);var pp=$("#rbBody",box);if(pp&&!$(".msg",pp)){var m=d.createElement("div");m.className="msg e";m.textContent=t("pickM");pp.appendChild(m)}return}st=Math.max(1,Math.min(4,n));draw();return}
-if(tg.dataset.act=="act"){var v=$("#rbCode",box).value,ms=$("#rbMsg",box);if(norm(v).length<8){ms.className="msg e";ms.textContent=t("wrong");return}ms.className="msg";ms.textContent=t("checking");unlock(p.lock,v).then(function(u){if(!u){ms.className="msg e";ms.textContent=t("wrong");$("#rbCode",box).classList.add("sh");return}ls("rb_u_"+p.id,v);return applyUnlock(p,u).then(function(){ms.textContent="";tg.style.display="none";done();render()})})}});
+if(tg.dataset.act=="act"){var v=$("#rbCode",box).value,ms=$("#rbMsg",box);if(norm(v).length<8){ms.className="msg e";ms.textContent=t("wrong");return}ms.className="msg";ms.textContent=t("checking");(p.lock=="server-v1"?(window.RABITI_DELIVERY?window.RABITI_DELIVERY.redeem(p,v):Promise.reject(new Error("التفعيل متاح في الصفحة العامة المنشورة، وليس في المعاينة."))):unlock(p.lock,v)).then(function(u){if(!u){ms.className="msg e";ms.textContent=t("wrong");$("#rbCode",box).classList.add("sh");return}if(p.lock!="server-v1")ls("rb_u_"+p.id,v);return applyUnlock(p,u).then(function(){ms.textContent="";tg.style.display="none";done();render()})}).catch(function(e){ms.className="msg e";ms.textContent=e.message||t("wrong")})}});
 draw()}
 function openSub(){var o=modal('<h3>'+esc(SB.title||t("subTitle"))+'</h3><p>'+t("subDesc")+'</p><input id="rbEm" type="email" dir="ltr" placeholder="'+t("emailPh")+'" autocomplete="email"/><div class="msg" id="rbSm"></div><button type="button" class="mbtn" style="width:100%" id="rbSend">'+t("send")+'</button>'),em=$("#rbEm",o),sm=$("#rbSm",o);
 function say(k,c){sm.className="msg "+c;sm.textContent=t(k)}
@@ -122,6 +122,6 @@ d.addEventListener("click",function(e){var b=e.target.closest?e.target.closest('
 // Explicit navigation also works in srcdoc previews and installed web apps.
 d.addEventListener("click",function(e){var a=e.target.closest?e.target.closest('a[href^="#/"]'):null;if(!a)return;e.preventDefault();var h=a.getAttribute("href");if(location.hash!==h){try{history.pushState(null,"",h)}catch(x){location.hash=h}}route()});
 window.addEventListener("popstate",route);window.addEventListener("hashchange",route);route();
-PR.forEach(function(p){var c=p.mode=="paid"&&ls("rb_u_"+p.id);if(c)unlock(p.lock,c).then(function(u){if(u)return applyUnlock(p,u).then(render)})})}
+PR.forEach(function(p){if(p.lock=="server-v1"){if(window.RABITI_DELIVERY)window.RABITI_DELIVERY.resume(p).then(function(u){if(u)return applyUnlock(p,u).then(render)}).catch(function(){});return}var c=p.mode=="paid"&&ls("rb_u_"+p.id);if(c)unlock(p.lock,c).then(function(u){if(u)return applyUnlock(p,u).then(render)})})}
 if(d.readyState=="loading")d.addEventListener("DOMContentLoaded",boot);else boot();
 })();

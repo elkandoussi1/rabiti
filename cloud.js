@@ -5,7 +5,7 @@ const CLOUD = (()=>{
  const enabled=!!(cfg.supabaseUrl&&cfg.supabasePublishableKey)&&new URL(location.href).searchParams.get('local')!=='1';
  const slugOK=s=>/^[a-z0-9][a-z0-9-]{2,39}$/.test(s);
  const url=s=>{const u=new URL('public.html',location.href);u.searchParams.set('store',s);return u.href};
- function message(e){const m=e?.message||String(e);if(m.includes('REVISION_CONFLICT'))return 'توجد تعديلات أحدث من جهاز آخر. صدّر نسختك ثم أعد تحميل الصفحة قبل المتابعة.';if(m.includes('PAID_DELIVERY'))return 'نشر المنتجات المدفوعة يتطلب خدمة تسليم آمنة. أخفها أو استخدم رابط شراء خارجي.';if(e?.code==='23505')return 'اسم المتجر محجوز، اختر اسمًا آخر.';return m==='Failed to fetch'?'تعذر الاتصال. لم تُحفظ التعديلات سحابيًا؛ أعد المحاولة أو صدّر نسخة.':m}
+ function message(e){const m=e?.message||String(e);if(m.includes('REVISION_CONFLICT'))return 'توجد تعديلات أحدث من جهاز آخر. صدّر نسختك ثم أعد تحميل الصفحة قبل المتابعة.';if(m.includes('PAID_SOURCE_REQUIRED'))return 'حدّد ملفًا أو رابطًا للمنتج المدفوع ثم احفظه.';if(m.includes('PAID_CODES_REQUIRED'))return 'أنشئ أكواد التفعيل للمنتج ثم احفظه وأعد النشر.';if(e?.code==='23505')return 'اسم المتجر محجوز، اختر اسمًا آخر.';return m==='Failed to fetch'?'تعذر الاتصال. لم تُحفظ التعديلات سحابيًا؛ أعد المحاولة أو صدّر نسخة.':m}
  function fail(e){status=message(e);const n=$('#cloud-status');if(n)n.textContent=status;const a=$('#cloud-error');if(a)a.textContent=status;toast(status,5000)}
  function auth(v='login',msg=''){
  view=v;$('#app').style.display='none';$('#auth').style.display='flex';
@@ -35,6 +35,7 @@ const CLOUD = (()=>{
  // Capture each draft before enqueueing; CAS prevents one device overwriting another.
  function persist(){if(!user||!store||!S)return Promise.resolve(true);const snapshot=clone(S),owner=user.id;
  const job=queue.catch(()=>{}).then(async()=>{if(user?.id!==owner)throw Error('تغير الحساب قبل الحفظ');const r=await client.rpc('rabiti_save',{p_draft:snapshot,p_revision:store.revision});if(r.error)throw r.error;store.revision=r.data;status='تم حفظ المسودة ✓';const n=$('#cloud-status');if(n)n.textContent=status;return true});queue=job;return job.catch(e=>{fail(e);return false})}
+ async function codeStatus(id){const {data,error}=await client.rpc('rabiti_code_status',{p_product_id:id});if(error)throw error;return data||[]}
  async function publish(){clearTimeout(saveT);if(!await persist())return;try{const {data,error}=await client.rpc('rabiti_publish',{p_revision:store.revision});if(error)throw error;S.siteUrl=url(data);S.dirty=0;status='نُشرت التعديلات ✓';render();toast(status)}catch(e){fail(e)}}
  async function unpublish(){if(!confirm('إيقاف إتاحة صفحتك للزوار؟ تبقى مسودتك محفوظة.'))return;try{const {error}=await client.rpc('rabiti_unpublish');if(error)throw error;status='تم إيقاف النشر';render()}catch(e){fail(e)}}
  async function logout(){clearTimeout(saveT);if(S&&!await persist())return;const {error}=await client.auth.signOut();if(error)return fail(error);user=null;store=null;ACC=null;S=null;document.querySelectorAll('.pv').forEach(n=>n.remove());closeS();auth()}
@@ -50,6 +51,6 @@ const CLOUD = (()=>{
  const {data,error}=await client.auth.getSession();if(error)throw error;
  if(recovery&&data.session)auth('reset');else if(data.session)await enter();else auth();return true;
  }
- const api={enabled,auth,init,persist,publish,unpublish,logout,panel,copy,retry:()=>persist(),forgot:()=>{closeS();auth('forgot')},fail,slugOK};return api;
+ const api={codeStatus,publicUrl:()=>url(store.slug),enabled,auth,init,persist,publish,unpublish,logout,panel,copy,retry:()=>persist(),forgot:()=>{closeS();auth('forgot')},fail,slugOK};return api;
 })();
 if(CLOUD.enabled){persist=CLOUD.persist;rPub=CLOUD.panel;AU.logout=CLOUD.logout;}

@@ -21,6 +21,18 @@
  const u=new URL('/rest/v1/rabiti_pages',c.supabaseUrl);u.searchParams.set('slug','eq.'+slug);u.searchParams.set('select','payload');
  const response=await fetch(u,{headers:{apikey:c.supabasePublishableKey},cache:'no-store'});if(!response.ok)throw Error('تعذر تحميل المتجر، أعد المحاولة.');
  const rows=await response.json();if(!rows.length)throw Error('هذا المتجر غير منشور أو أوقف صاحبه النشر.');
+
+ // Persist the receipt before the request: retries after a dropped response are safe.
+ const receiptKey=p=>'rb_receipt_'+slug+'_'+p.id;
+ function readReceipt(p,pending=false){try{return JSON.parse(localStorage.getItem(receiptKey(p)+(pending?'_pending':''))||'null')}catch{return null}}
+ async function rpc(name,args){const r=await fetch(new URL('/rest/v1/rpc/'+name,c.supabaseUrl),{method:'POST',headers:{apikey:c.supabasePublishableKey,'Content-Type':'application/json'},body:JSON.stringify(args),cache:'no-store'});if(!r.ok)throw Error('تعذر الاتصال بخدمة التفعيل. أعد المحاولة.');return r.json()}
+ function delivery(p,result){if(!result)return null;const u=safeUrl(result.source,false,true);if(!u)throw Error('رابط التسليم غير صالح. تواصل مع البائع.');p.fn=result.filename||'';return u}
+ window.RABITI_DELIVERY={
+ async redeem(p,code){const normalized=String(code).toUpperCase().replace(/[^A-Z0-9]/g,'');const confirmed=readReceipt(p),pending=readReceipt(p,true);let saved=confirmed?.code===normalized?confirmed:pending?.code===normalized?pending:null;if(!saved)saved={code:normalized,token:Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('')};try{localStorage.setItem(receiptKey(p)+'_pending',JSON.stringify(saved))}catch{throw Error('فعّل تخزين المتصفح قبل استعمال الكود حتى تستطيع إعادة التحميل.')}
+ const result=await rpc('rabiti_redeem',{p_slug:slug,p_product_id:p.id,p_code:code,p_receipt:saved.token});if(!result)throw Error('الكود غير صحيح أو سبق تفعيله على متصفح آخر.');try{localStorage.setItem(receiptKey(p),JSON.stringify(saved));localStorage.removeItem(receiptKey(p)+'_pending')}catch{}return delivery(p,result)
+ },
+ async resume(p){for(const saved of [readReceipt(p,true),readReceipt(p)]){if(!saved)continue;const result=await rpc('rabiti_download',{p_slug:slug,p_product_id:p.id,p_receipt:saved.token});if(result)return delivery(p,result)}return null}
+ };
  document.getElementById('rb-data').textContent=JSON.stringify(sanitize(rows[0].payload));
  const script=document.createElement('script');script.src='store-renderer.js';script.onload=()=>status.remove();script.onerror=()=>{status.textContent='تعذر تحميل الصفحة، أعد المحاولة.'};document.body.appendChild(script);
  }catch(e){document.getElementById('rb').remove();status.textContent=e.message}
