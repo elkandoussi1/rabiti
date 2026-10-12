@@ -312,14 +312,16 @@ if(m=="feedburner"&&SB.feed){var f=d.createElement("form");f.method="post";f.act
 if(m=="post"&&SB.endpoint){var fd=new FormData();fd.append(SB.field||"email",v);(SB.extra||"").split("&").forEach(function(kv){var i=kv.indexOf("=");if(i>0)fd.append(kv.slice(0,i),kv.slice(i+1))});fetch(SB.endpoint,{method:"POST",body:fd,mode:"no-cors"}).then(function(){ls("rb_sub","1");say("subOk","s");em.value=""},function(){say("subNone","e")});return}
 if(m=="mailto"&&SB.email){location.href="mailto:"+SB.email+"?subject="+encodeURIComponent("Subscribe")+"&body="+encodeURIComponent(v);say("subOk","s");return}
 say("subNone","e")};em.focus()}
-function route(){var m=location.hash.match(/^#\/p\/(.+)$/);CURP=m?decodeURIComponent(m[1]):null;render();window.scrollTo(0,0)}
+function route(){var m=location.hash.match(/^#\/p\/(.+)$/);try{CURP=m?decodeURIComponent(m[1]):null}catch(e){CURP=null}render();window.scrollTo(0,0)}
 function boot(){theme();applyDesign();setDir();d.title=(PF.name||"")+(PF.bio?" — "+PF.bio.slice(0,60):"");
 var br=$(".rb-brand");br.textContent=PF.name||"";profile();hasL=lists();
 $("#rbMode").onclick=function(){var x=ROOT.getAttribute("data-theme")=="dark"?"light":"dark";ROOT.setAttribute("data-theme",x);ls("rb_mode",x);d.body.style.background=pvBg();d.body.style.backgroundAttachment="fixed"};
 $("#rbLang").onclick=function(){lang=(lang+1)%3;ls("rb_lang",LG[lang]);render()};
 $("#rbSub").onclick=openSub;
 d.addEventListener("click",function(e){var b=e.target.closest?e.target.closest('[data-act="buy"]'):null;if(!b)return;e.preventDefault();var p=PR.filter(function(x){return x.id==b.dataset.id})[0];if(p)openPay(p)});
-window.addEventListener("hashchange",route);route();
+// Explicit navigation also works in srcdoc previews and installed web apps.
+d.addEventListener("click",function(e){var a=e.target.closest?e.target.closest('a[href^="#/"]'):null;if(!a)return;e.preventDefault();var h=a.getAttribute("href");if(location.hash!==h){try{history.pushState(null,"",h)}catch(x){location.hash=h}}route()});
+window.addEventListener("popstate",route);window.addEventListener("hashchange",route);route();
 PR.forEach(function(p){var c=p.mode=="paid"&&ls("rb_u_"+p.id);if(c)unlock(p.lock,c).then(function(u){if(u)return applyUnlock(p,u).then(render)})})}
 if(d.readyState=="loading")d.addEventListener("DOMContentLoaded",boot);else boot();
 })();
@@ -557,12 +559,13 @@ delPay(id){S.pay=S.pay.filter(x=>x.id!=id);save();render()},
 setD(k,v,quiet){S.design[k]=v;save();if(!quiet)render()},sD(k){return v=>X.setD(k,v)},setLang(v){S.lang=v;save();render()},
 /* publish */
 setUrl(v){S.siteUrl=v.trim();save()},
-copyUrl(){if(!S.siteUrl)return toast(_("الصق رابط موقعك أولًا","Paste your site link first","Collez d'abord le lien"));navigator.clipboard.writeText(S.siteUrl).then(()=>toast(_("تم النسخ ✓","Copied ✓","Copié ✓")))},
-wa(){if(!S.siteUrl)return toast(_("الصق رابط موقعك أولًا","Paste your site link first","Collez d'abord le lien"));window.open("https://wa.me/?text="+encodeURIComponent(S.siteUrl),"_blank")},
-shareUrl(){if(!S.siteUrl)return toast(_("الصق رابط موقعك أولًا","Paste your site link first","Collez d'abord le lien"));navigator.share?navigator.share({title:S.profile.name,url:S.siteUrl}):X.copyUrl()},
+publicUrl(){try{const u=new URL(S.siteUrl);if(!/^https?:$/.test(u.protocol)||u.username||u.password)throw 0;const here=new URL(location.href);if(u.origin===here.origin&&(u.pathname===here.pathname||u.pathname.replace(/index\.html$/," ").trim()===here.pathname.replace(/index\.html$/," ").trim()))throw 0;return u.href}catch(e){toast(_("ضع رابط صفحة الزبائن المنشورة، وليس رابط لوحة التحكم أو المعاينة.","Use the published customer page URL, not the dashboard or preview.","Utilisez le lien public publié, pas le tableau de bord."),4500);return null}},
+copyUrl(){if(!S.siteUrl)return toast(_("الصق رابط موقعك أولًا","Paste your site link first","Collez d'abord le lien"));const u=X.publicUrl();if(!u)return;navigator.clipboard.writeText(u).then(()=>toast(_("تم النسخ ✓","Copied ✓","Copié ✓")))},
+wa(){if(!S.siteUrl)return toast(_("الصق رابط موقعك أولًا","Paste your site link first","Collez d'abord le lien"));const u=X.publicUrl();if(!u)return;window.open("https://wa.me/?text="+encodeURIComponent(u),"_blank","noopener")},
+shareUrl(){if(!S.siteUrl)return toast(_("الصق رابط موقعك أولًا","Paste your site link first","Collez d'abord le lien"));const u=X.publicUrl();if(!u)return;navigator.share?navigator.share({title:S.profile.name,url:u}).catch(e=>{if(e.name!=="AbortError")X.copyUrl()}):X.copyUrl()},
 zip(){const bad=checks().filter(x=>!x[0]);if(bad.length&&!confirm(_("بعض العناصر غير مكتملة:\n","Some items are incomplete:\n","Éléments incomplets :\n")+bad.map(x=>"• "+x[1]).join("\n")+"\n\n"+_("متابعة؟","Continue?","Continuer ?")))return;download("rabiti-site.zip",zip([{name:"index.html",data:buildSite()}]));S.dirty=0;toast(_("تم التنزيل — ارفع الملف إلى موقع الاستضافة","Downloaded — upload it to your host","Téléchargé — envoyez-le à votre hébergeur"),3800)},
-async shareFile(){const f=new File([zip([{name:"index.html",data:buildSite()}])],"rabiti-site.zip",{type:"application/zip"});try{if(navigator.canShare({files:[f]}))await navigator.share({files:[f],title:"Rabiti"});else X.zip()}catch(e){}},
-preview(){const o=document.createElement("div");o.className="pv";o.innerHTML='<div class="bar"><button class="btn sm o" id="pvx">✕ '+_("إغلاق","Close","Fermer")+'</button><span class="sp"></span><button class="btn sm o" id="pvo">↗</button></div><iframe></iframe>';document.body.appendChild(o);const f=$("iframe",o),h=buildSite();f.srcdoc=h;$("#pvx").onclick=()=>o.remove();$("#pvo").onclick=()=>{const w=window.open(URL.createObjectURL(new Blob([h],{type:"text/html"})),"_blank");if(!w)toast("Popup blocked")}},
+async shareFile(){const f=new File([zip([{name:"index.html",data:buildSite()}])],"rabiti-site.zip",{type:"application/zip"});try{if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:"Rabiti"});else X.zip()}catch(e){}},
+preview(){const o=document.createElement("div");o.className="pv";o.innerHTML='<div class="bar"><button class="btn sm o" id="pvx">✕ '+_("إغلاق","Close","Fermer")+'</button><span class="sp"></span><button class="btn sm o" id="pvo">↗</button></div><iframe></iframe>';document.body.appendChild(o);const f=$("iframe",o),h=buildSite();f.setAttribute("sandbox","allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-downloads allow-forms");f.srcdoc=h;$("#pvx").onclick=()=>o.remove();$("#pvo").onclick=()=>{const w=window.open(URL.createObjectURL(new Blob([h],{type:"text/html"})),"_blank");if(!w)toast("Popup blocked")}},
 install(){if(deferred){deferred.prompt();deferred.userChoice.finally(()=>{deferred=null;render()})}},
 exp(){download("rabiti-backup.json",new Blob([JSON.stringify(S)],{type:"application/json"}))},
 async imp(f){if(!f)return;try{const j=JSON.parse(await f.text());if(!j.profile||!j.links)throw 0;if(!confirm(_("استبدال البيانات الحالية؟","Replace current data?","Remplacer les données actuelles ?")))return;S=norm0(j);save();render();toast("✓")}catch(e){toast(_("ملف غير صالح","Invalid file","Fichier invalide"))}},
