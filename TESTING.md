@@ -20,3 +20,14 @@ Complete the real-service checks in SETUP-AR.md before public rollout.
 Paid delivery tests execute paid-delivery.sql and cover private sources/codes, redemption, same-receipt retries, second-browser rejection, owner-only code status, republishing without code reset, revocation, and unpublished products. UI tests cover manual checkout, lost-response retry, receipt preservation, and fast code generation.
 
 External checkout: tests/checkout.cjs applies external-checkout.sql and verifies valid product URLs, forged/unsafe URL rejection, public secret exclusion, editor save, and customer purchase/details links. No real third-party payment or account activation was performed.
+
+Version 2.0: tests/paid-ui.cjs now checks the independent previous-purchase
+dialog, removal of the manual checkout wizard, lost-response retry, receipt
+preservation and repeat download. tests/commerce-ui.cjs checks automatic defaults,
+legacy product edits without mutating the saved draft, invalid-link save refusal,
+public export secret exclusion, retirement of manual payment settings, saving
+before applying updates, and no editor fallback for customer/unknown routes.
+
+Run all six test scripts with npm test. CI runs the same command on Node.js 22.
+The profile README is prepared under docs/profile; publishing it to the special
+username repository and changing account profile settings require GitHub access.

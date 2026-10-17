@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">Ahmed El Kandoussi — Education, Design, Technology</title><desc id="desc">A clean navy and blue banner introducing Ahmed's educational and digital work in Morocco.</desc>
+  <rect width="1200" height="360" rx="24" fill="#182344"/>
+  <rect x="0" y="0" width="12" height="360" rx="6" fill="#a5b4fc"/>
+  <text x="60" y="70" fill="#a5b4fc" font-family="Arial,sans-serif" font-size="15" letter-spacing="4">EDUCATION · DESIGN · TECHNOLOGY</text>
+  <text x="60" y="153" fill="#fff" font-family="Arial,sans-serif" font-size="52" font-weight="700">AHMED EL KANDOUSSI</text>
+  <text x="60" y="203" fill="#d1d9eb" font-family="Arial,sans-serif" font-size="24">Building practical tools for teachers and creators.</text>
+  <text x="60" y="296" fill="#a5b4fc" font-family="Arial,sans-serif" font-size="18">MOROCCO  /  elkandoussi1</text>
+  <g fill="none" stroke="#a5b4fc" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="m1000 87-32 30 32 30m70-60 32 30-32 30m-35-75-17 90"/><path d="M966 228q34-15 68 0 34-15 68 0v62q-34-15-68 0-34-15-68 0zM1034 229v60"/></g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">Rabiti — One page. Your whole world.</title><desc id="desc">A navy banner with a link icon, Rabiti wordmark, and a simple product-page illustration.</desc>
+  <rect width="1200" height="360" rx="24" fill="#182344"/>
+  <rect x="56" y="58" width="62" height="62" rx="18" fill="#a5b4fc"/>
+  <g transform="translate(69 72)" fill="none" stroke="#182344" stroke-width="4" stroke-linecap="round"><path d="m13 12 7-7a9 9 0 0 1 13 13l-7 7M22 23l-7 7A9 9 0 0 1 2 17l7-7M12 23l11-11"/></g>
+  <text x="56" y="189" fill="#fff" font-family="Arial,sans-serif" font-size="66" font-weight="700">Rabiti</text>
+  <text x="56" y="232" fill="#d1d9eb" font-family="Arial,sans-serif" font-size="25">One page. Your whole world.</text>
+  <text x="56" y="292" fill="#a5b4fc" font-family="Arial,sans-serif" font-size="15" letter-spacing="3">LINKS  /  DIGITAL PRODUCTS  /  YOUR STOREFRONT</text>
+  <rect x="824" y="36" width="260" height="288" rx="24" fill="#f4f6fc"/>
+  <circle cx="954" cy="90" r="25" fill="#a5b4fc"/>
+  <rect x="899" y="132" width="110" height="9" rx="4" fill="#182344"/>
+  <rect x="854" y="166" width="200" height="34" rx="10" fill="#e0e5f5"/>
+  <rect x="854" y="210" width="92" height="86" rx="12" fill="#c4d5f6"/>
+  <rect x="958" y="210" width="96" height="86" rx="12" fill="#bce5d4"/>
+</svg>

@@ -1,7 +1,7 @@
-const C="rabiti-v6-checkout", F=["./config.js","./supabase.min.js","./cloud.js?v=checkout-20261017","./paid-editor.js?v=checkout-20261017","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png"];
+const C="rabiti-v7-auto", F=["./commerce.css?v=auto-20261017-2","./commerce-editor.js?v=auto-20261017-2","./app-update.js?v=auto-20261017-2","./config.js","./supabase.min.js","./cloud.js?v=auto-20261017-2","./paid-editor.js?v=auto-20261017-2","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(C).then(c=>c.addAll(F)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>/^rabiti-v/.test(k)&&k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener("fetch",e=>{const q=e.request,u=new URL(q.url);if(q.method!=="GET"||u.origin!==self.location.origin)return;
-if(q.mode==="navigate"){if(u.pathname.endsWith("/public.html"))return;e.respondWith(fetch(q).then(r=>{if(r.ok){const copy=r.clone();e.waitUntil(caches.open(C).then(c=>c.put(q,copy)))}return r}).catch(async()=>await caches.match(q)||await caches.match("./index.html")));return}
+if(q.mode==="navigate"){if(![new URL("./",self.registration.scope).pathname,new URL("index.html",self.registration.scope).pathname].includes(u.pathname))return;e.respondWith(fetch(q).then(r=>{if(r.ok){const copy=r.clone();e.waitUntil(caches.open(C).then(c=>c.put(q,copy)))}return r}).catch(async()=>await caches.match(q)||await caches.match("./index.html")));return}
 if(!F.some(f=>new URL(f,self.registration.scope).href===u.href))return;
 e.respondWith(fetch(q).then(r=>{if(r.ok){const copy=r.clone();e.waitUntil(caches.open(C).then(c=>c.put(q,copy)))}return r}).catch(()=>caches.match(q)))});
