@@ -18,3 +18,5 @@
 
 راجع [TESTING.md](TESTING.md) للاختبارات وحدودها، و[THIRD-PARTY.txt](THIRD-PARTY.txt)
 لنسبة مكتبة Supabase وترخيصها.
+
+بديل بيع اختياري: نمط «دفع وتسليم عبر Gumroad» يعرض رابط شراء رسميًا؛ الدفع والتسليم ومكتبة المشتري تكون لدى Gumroad. راجع [GUMROAD-SETUP.md](GUMROAD-SETUP.md) للإعداد والرسوم والحدود.

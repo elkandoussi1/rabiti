@@ -5,7 +5,7 @@ const CLOUD = (()=>{
  const enabled=!!(cfg.supabaseUrl&&cfg.supabasePublishableKey)&&new URL(location.href).searchParams.get('local')!=='1';
  const slugOK=s=>/^[a-z0-9][a-z0-9-]{2,39}$/.test(s);
  const url=s=>{const u=new URL('public.html',location.href);u.searchParams.set('store',s);return u.href};
- function message(e){const m=e?.message||String(e);if(m.includes('REVISION_CONFLICT'))return 'توجد تعديلات أحدث من جهاز آخر. صدّر نسختك ثم أعد تحميل الصفحة قبل المتابعة.';if(m.includes('PAID_SOURCE_REQUIRED'))return 'حدّد ملفًا أو رابطًا للمنتج المدفوع ثم احفظه.';if(m.includes('PAID_CODES_REQUIRED'))return 'أنشئ أكواد التفعيل للمنتج ثم احفظه وأعد النشر.';if(e?.code==='23505')return 'اسم المتجر محجوز، اختر اسمًا آخر.';return m==='Failed to fetch'?'تعذر الاتصال. لم تُحفظ التعديلات سحابيًا؛ أعد المحاولة أو صدّر نسخة.':m}
+ function message(e){const m=e?.message||String(e);if(m.includes('REVISION_CONFLICT'))return 'توجد تعديلات أحدث من جهاز آخر. صدّر نسختك ثم أعد تحميل الصفحة قبل المتابعة.';if(m.includes('PAID_SOURCE_REQUIRED'))return 'حدّد ملفًا أو رابطًا للمنتج المدفوع ثم احفظه.';if(m.includes('PAID_CODES_REQUIRED'))return 'أنشئ أكواد التفعيل للمنتج ثم احفظه وأعد النشر.';if(m.includes('INVALID_CHECKOUT_URL'))return 'ضع رابط منتج Gumroad الصحيح ثم احفظ وأعد النشر.';if(e?.code==='23505')return 'اسم المتجر محجوز، اختر اسمًا آخر.';return m==='Failed to fetch'?'تعذر الاتصال. لم تُحفظ التعديلات سحابيًا؛ أعد المحاولة أو صدّر نسخة.':m}
  function fail(e){status=message(e);const n=$('#cloud-status');if(n)n.textContent=status;const a=$('#cloud-error');if(a)a.textContent=status;toast(status,5000)}
  function auth(v='login',msg=''){
  view=v;$('#app').style.display='none';$('#auth').style.display='flex';

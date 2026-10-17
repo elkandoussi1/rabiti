@@ -18,3 +18,5 @@ Browser visual testing was unavailable because the Chromium download failed.
 Complete the real-service checks in SETUP-AR.md before public rollout.
 
 Paid delivery tests execute paid-delivery.sql and cover private sources/codes, redemption, same-receipt retries, second-browser rejection, owner-only code status, republishing without code reset, revocation, and unpublished products. UI tests cover manual checkout, lost-response retry, receipt preservation, and fast code generation.
+
+External checkout: tests/checkout.cjs applies external-checkout.sql and verifies valid product URLs, forged/unsafe URL rejection, public secret exclusion, editor save, and customer purchase/details links. No real third-party payment or account activation was performed.

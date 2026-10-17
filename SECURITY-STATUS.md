@@ -26,3 +26,12 @@ The system controls first code activation; it is not DRM. Keeping receipt data
 allows repeat downloads from the same browser. Clearing that data or changing
 browser/device requires the seller to issue a new code. Unpublishing hides the
 product and prevents redemption/resumption until it is published again.
+
+17 October 2026: optional Gumroad checkout accepts only HTTPS product URLs on
+gumroad.com or one of its subdomains. The current publish function still omits
+private delivery sources and code data. Local tests and a rolled-back transaction
+on the real project verified publication, forged URL rejection, secret exclusion,
+and anonymous read/publish isolation. No third-party payment was performed.
+The security advisor still reports only the Auth setting above; performance
+advisors report no findings. Hosted checkout/delivery takes place on Gumroad,
+with no sale synchronization or automatic local delivery from Rabiti.

@@ -34,6 +34,6 @@
  async resume(p){for(const saved of [readReceipt(p,true),readReceipt(p)]){if(!saved)continue;const result=await rpc('rabiti_download',{p_slug:slug,p_product_id:p.id,p_receipt:saved.token});if(result)return delivery(p,result)}return null}
  };
  document.getElementById('rb-data').textContent=JSON.stringify(sanitize(rows[0].payload));
- const script=document.createElement('script');script.src='store-renderer.js?v=paid-20261012';script.onload=()=>status.remove();script.onerror=()=>{status.textContent='تعذر تحميل الصفحة، أعد المحاولة.'};document.body.appendChild(script);
+ const script=document.createElement('script');script.src='store-renderer.js?v=checkout-20261017';script.onload=()=>status.remove();script.onerror=()=>{status.textContent='تعذر تحميل الصفحة، أعد المحاولة.'};document.body.appendChild(script);
  }catch(e){document.getElementById('rb').remove();status.textContent=e.message}
 })();

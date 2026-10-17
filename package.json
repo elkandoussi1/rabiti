@@ -2,7 +2,7 @@
   "name": "rabiti",
   "private": true,
   "scripts": {
-    "test": "node tests/database.cjs && node tests/paid.cjs && node tests/ui.cjs && node tests/paid-ui.cjs"
+    "test": "node tests/database.cjs && node tests/paid.cjs && node tests/ui.cjs && node tests/paid-ui.cjs && node tests/checkout.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",
