@@ -1,13 +1,13 @@
 {
  "name": "رابطي — Rabiti",
  "short_name": "رابطي",
- "description": "صفحة روابط ومتجر منتجات رقمية",
+ "description": "لوحة تحكم لصفحة روابط ومتجر منتجات رقمية مع طلبات ومدفوعات وتسليم آمن.",
  "start_url": "./index.html",
  "scope": "./",
  "display": "standalone",
  "orientation": "portrait",
- "background_color": "#6a2fd6",
- "theme_color": "#6a2fd6",
+ "background_color": "#f5f6f8",
+ "theme_color": "#0d9488",
  "lang": "ar",
  "dir": "rtl",
  "icons": [

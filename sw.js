@@ -1,7 +1,74 @@
-const C="rabiti-v7-auto", F=["./commerce.css?v=auto-20261017-2","./commerce-editor.js?v=auto-20261017-2","./app-update.js?v=auto-20261017-2","./config.js","./supabase.min.js","./cloud.js?v=auto-20261017-2","./paid-editor.js?v=auto-20261017-2","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(C).then(c=>c.addAll(F.map(f=>new Request(f,{cache:'reload'})))).then(()=>self.skipWaiting())));
-self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>/^rabiti-v/.test(k)&&k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener("fetch",e=>{const q=e.request,u=new URL(q.url);if(q.method!=="GET"||u.origin!==self.location.origin)return;
-if(q.mode==="navigate"){if(![new URL("./",self.registration.scope).pathname,new URL("index.html",self.registration.scope).pathname].includes(u.pathname))return;e.respondWith(fetch(q,{cache:'no-store'}).then(r=>{if(r.ok){const copy=r.clone();e.waitUntil(caches.open(C).then(c=>c.put(q,copy)))}return r}).catch(async()=>await caches.match(q)||await caches.match("./index.html")));return}
-if(!F.some(f=>new URL(f,self.registration.scope).href===u.href))return;
-e.respondWith(fetch(q).then(r=>{if(r.ok){const copy=r.clone();e.waitUntil(caches.open(C).then(c=>c.put(q,copy)))}return r}).catch(()=>caches.match(q)))});
+/* Rabiti service worker: app shell offline, fresh files when online. */
+const CACHE = "rabiti-v8-v2";
+const ASSETS = [
+  "./index.html",
+  "./public.html",
+  "./app.css",
+  "./store.css",
+  "./ui.js",
+  "./api.js",
+  "./views.js",
+  "./app.js",
+  "./public.js",
+  "./app-update.js",
+  "./config.js",
+  "./supabase.min.js",
+  "./manifest.webmanifest",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./icon-maskable-512.png",
+  "./assets/rabiti-banner.svg"
+];
+
+const scopeUrl = (path) => new URL(path, self.registration.scope).href;
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE)
+      .then((cache) => cache.addAll(ASSETS.map((path) => new Request(path, { cache: "reload" }))))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((key) => /^rabiti-v/.test(key) && key !== CACHE).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
+});
+
+async function networkFirst(request, fallbackPath) {
+  try {
+    const response = await fetch(request, { cache: "no-store" });
+    if (response && response.ok) {
+      const copy = response.clone();
+      caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
+    }
+    return response;
+  } catch {
+    return (await caches.match(request)) ||
+      (fallbackPath ? await caches.match(fallbackPath) : null) ||
+      Response.error();
+  }
+}
+
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+  if (request.method !== "GET") return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (request.mode === "navigate") {
+    const path = url.pathname;
+    const root = new URL("./", self.registration.scope).pathname;
+    const index = new URL("index.html", self.registration.scope).pathname;
+    const store = new URL("public.html", self.registration.scope).pathname;
+    if (![root, index, store].includes(path)) return;
+    event.respondWith(networkFirst(request, path === store ? "./public.html" : "./index.html"));
+    return;
+  }
+
+  if (!ASSETS.some((path) => scopeUrl(path) === url.href)) return;
+  event.respondWith(networkFirst(request));
+});
