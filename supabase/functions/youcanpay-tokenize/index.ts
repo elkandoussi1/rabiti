@@ -149,9 +149,21 @@ Deno.serve(async (req) => {
   }
 
   const nested = payload.data as Record<string, unknown> | undefined;
-  const token = payload.token ?? nested?.token ?? payload.access_token ?? nested?.access_token;
+  /* yp.js forwards this value to /pay as `token_id`, and that endpoint rejects
+   * anything that is not a UUID with a 422 "invalid fields" error. YouCan Pay's
+   * tokenize response carries both `token` (a short reference such as
+   * `cp500014337`) and `transaction_id` (a UUID), so prefer whichever value is
+   * actually a UUID and keep the first string as a fallback. */
+  const isUuid = (value: string) =>
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  const candidates = [
+    payload.token, payload.transaction_id,
+    nested?.token, nested?.transaction_id,
+    payload.access_token, nested?.access_token,
+  ].filter((value): value is string => typeof value === "string" && value.trim() !== "");
+  const token = candidates.find(isUuid) ?? candidates[0];
   if (!token) {
-    console.error("youcanpay-tokenize: provider returned no token");
+    console.error("youcanpay-tokenize: provider returned no token", Object.keys(payload));
     return json({ error: "tokenize_failed" }, 502);
   }
 

@@ -38,6 +38,8 @@ assert.match(tokenize, /youcanpay\.com\/sandbox\/api\/tokenize/);
 assert.match(tokenize, /youcanpay\.com\/api\/tokenize/);
 assert.match(tokenize, /pri_key: String\(secret\.private_key\)/);
 assert.match(tokenize, /token: String\(token\)/);
+assert.match(tokenize, /payload\.transaction_id/);
+assert.match(tokenize, /candidates\.find\(isUuid\)/);
 assert.match(tokenize, /public_key: String\(secret\.public_key\)/);
 assert.match(tokenize, /sandbox,/);
 assert.equal(/console\.(?:log|info|debug)\([^)]*private_key/.test(tokenize), false);
