@@ -77,7 +77,7 @@ export async function overview(ctx) {
     <div class="card stat"><div class="ico amber">${icon('eye')}</div><div class="label">زيارات 30 يومًا</div><div class="value">${s.views_30d || 0}</div><div class="foot">${pctTrend(s.views_30d || 0, s.views_prev_30d || 0)} <span>${s.visitors_30d || 0} زائرًا</span></div></div>
     <div class="card stat"><div class="ico blue">${icon('trending')}</div><div class="label">معدل التحويل</div><div class="value">${conv}%</div><div class="foot"><span>${s.checkout_starts_30d || 0} بدء دفع</span></div></div>
   </div>
-  <div class="grid" style="grid-template-columns:1.55fr 1fr;margin-top:18px">
+  <div class="grid split" style="--split:1.55fr 1fr;margin-top:18px">
     <div class="card"><div class="card-head"><div><h3>الإيرادات</h3><p>آخر 30 يومًا</p></div><span class="chip teal">${money(s.revenue_30d_minor || 0, cur(d))}</span></div><div class="card-body">${lineChart(daily, { money: true, currency: cur(d) })}<div class="chart-legend"><span><i style="background:#0d9488"></i>الإيرادات اليومية</span></div></div></div>
     ${checklist(d, ctx.published)}
   </div>
@@ -105,7 +105,7 @@ export async function store(ctx) {
   ];
   const done = checks.filter((c) => c.ok).length;
   return `<div class="page-head"><div><h2>${ctx.published ? 'متجرك منشور' : 'متجرك كمسودة'}</h2><p>${ctx.published ? 'أي تعديل تحفظه يبقى مسودة حتى تضغط «نشر التعديلات».' : 'انشر متجرك عندما تكون جاهزًا، ويمكنك إيقاف النشر في أي وقت.'}</p></div><div class="actions"><button class="btn" data-act="preview">${icon('eye', 'sm')} معاينة</button>${ctx.published ? `<button class="btn" data-act="unpublish">${icon('ban', 'sm')} إيقاف النشر</button>` : ''}<button class="btn primary" data-act="publish">${icon('rocket', 'sm')} ${ctx.published ? 'نشر التعديلات' : 'نشر المتجر'}</button></div></div>
-  <div class="grid" style="grid-template-columns:1.5fr 1fr">
+  <div class="grid split" style="--split:1.5fr 1fr">
     <div class="stack">
       <div class="card"><div class="card-head"><div><h3>الرابط العام</h3><p>شارك هذا الرابط مع زبائنك</p></div><span class="chip ${ctx.published ? 'green' : 'amber'}"><span class="dot"></span>${ctx.published ? 'منشور' : 'غير منشور'}</span></div><div class="card-body"><div class="share-link"><input value="${attr(url)}" readonly id="store-url"><button class="btn primary sm" data-act="copy-store">${icon('copy', 'sm')} نسخ</button></div><div class="row wrap" style="margin-top:12px"><a class="btn sm" href="${attr(url)}" target="_blank" rel="noopener">${icon('external', 'sm')} فتح المتجر</a><a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent('تفضل بزيارة متجري: ' + url)}">${icon('whatsapp', 'sm')} واتساب</a><a class="btn sm" target="_blank" rel="noopener" href="https://t.me/share/url?url=${encodeURIComponent(url)}">${icon('telegram', 'sm')} تيليجرام</a><button class="btn sm" data-act="share-native">${icon('share', 'sm')} مشاركة</button></div>${ctx.publishedAt ? `<p class="tiny muted" style="margin:12px 0 0">آخر نشر: ${esc(fmtDateTime(ctx.publishedAt))}</p>` : ''}</div></div>
       <div class="card"><div class="card-head"><div><h3>معاينة مباشرة</h3><p>تظهر المسودة الحالية بعد الحفظ التلقائي</p></div><button class="btn sm" data-act="refresh-preview">${icon('refresh', 'sm')} تحديث</button></div><div class="card-body"><iframe class="preview-frame" id="store-preview" src="${attr(previewUrl.href)}" title="معاينة المتجر" loading="lazy"></iframe></div></div>
@@ -198,7 +198,7 @@ export async function payments(ctx) {
   return `<div class="page-head"><div><h2>المدفوعات</h2><p>اختر كيف يدفع زبائنك. يمكنك الجمع بين أكثر من طريقة.</p></div><div class="actions"><button class="btn" data-act="payment-guide">${icon('help', 'sm')} دليل YouCan Pay</button></div></div>
   ${err ? `<div class="callout rose" style="margin-bottom:16px">${icon('alert')}<div>${esc(err)}</div></div>` : ''}
   ${paidCount && !ycp.enabled && !methods.some((m) => m.on) ? `<div class="callout warn" style="margin-bottom:16px">${icon('alert')}<div><b>لديك ${paidCount} منتجًا مدفوعًا بدون طريقة دفع</b><span>أضف طريقة يدوية أو فعّل YouCan Pay لتتمكن من النشر.</span></div></div>` : ''}
-  <div class="grid" style="grid-template-columns:1.05fr .95fr">
+  <div class="grid split" style="--split:1.05fr .95fr">
     <div class="stack">
       <div class="card"><div class="card-head"><div><h3>YouCan Pay</h3><p>بطاقات بنكية وCashPlus · بدون رسوم شهرية</p></div><span class="chip ${ycp.enabled ? 'green' : 'amber'}"><span class="dot"></span>${ycp.enabled ? 'مفعّل' : ycp.publicKey ? 'غير مفعّل' : 'غير مربوط'}</span></div><div class="card-body">
         <div class="callout" style="margin-bottom:14px">${icon('shield')}<div><b>مفاتيحك محمية</b><span>المفتاح الخاص يُخزَّن في قاعدة البيانات ولا يظهر أبدًا في صفحة المتجر. لا تشاركه مع أي شخص.</span></div></div>
@@ -223,7 +223,7 @@ export async function design(ctx) {
   const previewUrl = new URL('public.html', location.href);
   previewUrl.searchParams.set('store', ctx.store.slug); previewUrl.searchParams.set('preview', '1');
   return `<div class="page-head"><div><h2>التصميم</h2><p>اختر هوية متجرك. كل التغييرات تُحفظ تلقائيًا وتظهر بعد النشر.</p></div><div class="actions"><button class="btn" data-act="refresh-preview">${icon('refresh', 'sm')} تحديث المعاينة</button><button class="btn primary" data-act="publish">${icon('rocket', 'sm')} نشر التصميم</button></div></div>
-  <div class="grid" style="grid-template-columns:1.35fr 1fr">
+  <div class="grid split" style="--split:1.35fr 1fr">
     <div class="stack">
       <div class="card"><div class="card-head"><div><h3>الهوية</h3><p>الصورة والاسم والنبذة</p></div></div><div class="card-body">
         <div class="row" style="gap:14px;margin-bottom:16px"><span class="thumb" style="width:62px;height:62px;border-radius:18px;overflow:hidden;font-size:19px">${d.profile.avatar ? `<img src="${attr(d.profile.avatar)}" alt="">` : esc(initials(d.profile.name))}</span><div style="flex:1"><b class="small">الصورة الشخصية</b><p class="tiny muted" style="margin:2px 0 7px">مربعة أو دائرية، تُقصّ تلقائيًا.</p><label class="btn sm" style="display:inline-flex">${icon('upload', 'sm')} رفع صورة<input type="file" accept="image/*" id="avatar-input" hidden></label>${d.profile.avatar ? ` <button class="btn sm danger" data-act="remove-avatar">${icon('trash', 'sm')}</button>` : ''}</div></div>
@@ -261,7 +261,7 @@ export async function analytics(ctx) {
   ];
   return `<div class="page-head"><div><h2>التحليلات</h2><p>آخر 30 يومًا · ${s.visitors_30d || 0} زائرًا · ${s.views_30d || 0} زيارة</p></div><div class="actions"><button class="btn" data-act="export-analytics">${icon('download', 'sm')} تصدير CSV</button></div></div>
   <div class="grid c4"><div class="card stat"><div class="ico amber">${icon('eye')}</div><div class="label">الزيارات</div><div class="value">${s.views_30d || 0}</div><div class="foot">${pctTrend(s.views_30d || 0, s.views_prev_30d || 0)}</div></div><div class="card stat"><div class="ico blue">${icon('users')}</div><div class="label">الزوار الفريدون</div><div class="value">${s.visitors_30d || 0}</div><div class="foot"><span>${pct(s.visitors_30d || 0, s.views_30d || 1)}% من الزيارات</span></div></div><div class="card stat"><div class="ico violet">${icon('box')}</div><div class="label">مشاهدات المنتجات</div><div class="value">${s.product_views_30d || 0}</div><div class="foot"><span>${s.checkout_starts_30d || 0} بدء دفع</span></div></div><div class="card stat"><div class="ico teal">${icon('trending')}</div><div class="label">التحويل</div><div class="value">${conv}%</div><div class="foot"><span>${s.orders_30d || 0} طلبًا</span></div></div></div>
-  <div class="grid" style="grid-template-columns:1.5fr 1fr;margin-top:18px">
+  <div class="grid split" style="--split:1.5fr 1fr;margin-top:18px">
     <div class="card"><div class="card-head"><div><h3>الزيارات اليومية</h3><p>آخر 30 يومًا</p></div><span class="chip amber">${s.views_30d || 0}</span></div><div class="card-body">${lineChart(views, { money: false })}<div class="chart-legend"><span><i style="background:#0d9488"></i>زيارات الصفحة</span></div></div></div>
     <div class="card"><div class="card-head"><div><h3>مسار الشراء</h3><p>من الزيارة إلى الطلب</p></div></div><div class="card-body"><div class="funnel">${funnel.map(([t, v], i) => `<div class="funnel-step"><span style="width:82px" class="small muted">${t}</span><span class="bar"><i style="width:${Math.max(3, (v / maxF) * 100)}%"></i><span>${v}</span></span><em>${i === 0 ? '100%' : pct(v, funnel[0][1]) + '%'}</em></div>`).join('')}</div></div></div>
   </div>
@@ -276,7 +276,7 @@ export async function settings(ctx) {
   const d = ctx.draft;
   const slug = ctx.store.slug;
   return `<div class="page-head"><div><h2>الإعدادات</h2><p>بيانات المتجر والحساب. الحفظ تلقائي بعد كل تعديل.</p></div><div class="actions"><button class="btn" data-act="export">${icon('download', 'sm')} تصدير البيانات</button></div></div>
-  <div class="grid" style="grid-template-columns:1.2fr .8fr">
+  <div class="grid split" style="--split:1.2fr .8fr">
     <div class="stack">
       <div class="card"><div class="card-head"><div><h3>بيانات المتجر</h3><p>تظهر في صفحتك العامة ومحركات البحث</p></div></div><div class="card-body">
         <div class="field"><label>اسم المتجر</label><input class="input" data-field="profile.name" value="${attr(d.profile.name)}" maxlength="60"></div>

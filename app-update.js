@@ -1,6 +1,6 @@
 /* Refresh the Rabiti shell without clearing the session or unsaved edits. */
 window.RABITI_UPDATES = (() => {
-  const version = "2026.11.9.1";
+  const version = "2026.11.10.1";
   let registration;
   let lastCheck = 0;
   let busy = false;
