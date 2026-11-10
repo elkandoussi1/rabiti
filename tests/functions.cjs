@@ -22,6 +22,9 @@ assert.match(tokenize, /isHttpUrl\(successUrl\)/);
 assert.match(tokenize, /isHttpUrl\(errorUrl\)/);
 assert.match(tokenize, /SUPABASE_URL/);
 assert.match(tokenize, /SUPABASE_SERVICE_ROLE_KEY/);
+assert.match(tokenize, /SUPABASE_SECRET_KEYS/);
+assert.match(tokenize, /authHeaders\(serviceKey\)/);
+assert.equal(tokenize.includes('Authorization: `Bearer ${serviceKey}`'), false);
 assert.match(tokenize, /rabiti_payment_secret_for_order/);
 assert.match(tokenize, /p_order_no: orderNo/);
 assert.match(tokenize, /p_token: orderToken/);
@@ -54,6 +57,10 @@ assert.match(webhook, /safeEqual/);
 assert.match(webhook, /sandbox_mismatch/);
 assert.match(webhook, /transaction\.paid/);
 assert.match(webhook, /invalid_amount/);
+assert.match(webhook, /SUPABASE_SERVICE_ROLE_KEY/);
+assert.match(webhook, /SUPABASE_SECRET_KEYS/);
+assert.match(webhook, /authHeaders\(serviceKey\)/);
+assert.equal(webhook.includes('Authorization: `Bearer ${serviceKey}`'), false);
 assert.match(webhook, /rpc\/rabiti_confirm_payment/);
 assert.match(webhook, /p_event_id: eventId/);
 assert.match(webhook, /p_provider: "youcanpay"/);
@@ -62,7 +69,7 @@ assert.equal(/json\([^)]*private_key/.test(webhook), false);
 
 /* ---------------- extract and exercise the HMAC helper ---------------- */
 const start = webhook.indexOf('const encoder = new TextEncoder();');
-const end = webhook.indexOf('Deno.serve');
+const end = webhook.indexOf('/* Supabase is moving from the legacy service_role JWT');
 assert.equal(start >= 0 && end > start, true, 'could not locate the webhook HMAC helper');
 const logic = `${webhook.slice(start, end)
   .replace('(body: unknown, status = 200)', '(body, status = 200)')

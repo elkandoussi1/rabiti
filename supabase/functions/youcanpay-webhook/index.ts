@@ -39,11 +39,27 @@ const signatureMatches = async (raw: string, secret: string, header: string) => 
   return safeEqual(provided, toHex(digest)) || safeEqual(provided, toBase64(digest).toLowerCase());
 };
 
+/* Supabase is moving from the legacy service_role JWT to secret keys. Prefer
+ * the injected secret-key dictionary, then fall back to the legacy variable. */
+const serviceKey = (() => {
+  const raw = Deno.env.get("SUPABASE_SECRET_KEYS");
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const value = parsed.default ?? Object.values(parsed)[0];
+      if (typeof value === "string" && value) return value;
+    } catch { /* fall through to the legacy key */ }
+  }
+  return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+})();
+
+const authHeaders = (key: string) =>
+  key.startsWith("eyJ") ? { apikey: key, Authorization: `Bearer ${key}` } : { apikey: key };
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   const supabaseUrl = (Deno.env.get("SUPABASE_URL") ?? "").replace(/\/$/, "");
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   if (!supabaseUrl || !serviceKey) {
     console.error("youcanpay-webhook: missing Supabase environment");
     return json({ error: "server_not_configured" }, 500);
@@ -69,8 +85,7 @@ Deno.serve(async (req) => {
     fetch(`${supabaseUrl}/rest/v1/${path}`, {
       ...init,
       headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
+        ...authHeaders(serviceKey),
         "Content-Type": "application/json",
         ...(init.headers ?? {}),
       },
