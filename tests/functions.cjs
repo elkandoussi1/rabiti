@@ -56,6 +56,10 @@ assert.match(webhook, /crypto\.subtle\.sign\("HMAC"/);
 assert.match(webhook, /safeEqual/);
 assert.match(webhook, /sandbox_mismatch/);
 assert.match(webhook, /transaction\.paid/);
+assert.match(webhook, /payload\.event_name/);
+assert.match(webhook, /const envelope = \(payload\.payload/);
+assert.match(webhook, /envelope\.transaction/);
+assert.match(webhook, /envelope\.sandbox/);
 assert.match(webhook, /invalid_amount/);
 assert.match(webhook, /SUPABASE_SERVICE_ROLE_KEY/);
 assert.match(webhook, /SUPABASE_SECRET_KEYS/);
@@ -87,7 +91,12 @@ vm.runInContext(logic, context);
 const signatureMatches = context.signatureMatches;
 assert.equal(typeof signatureMatches, 'function');
 
-const raw = JSON.stringify({ event: 'transaction.paid', transaction: { order_id: 'RB-ABC', amount: 4900 } });
+const raw = JSON.stringify({
+  id: 'evt_1',
+  event_name: 'transaction.paid',
+  sandbox: true,
+  payload: { transaction: { order_id: 'RB-ABC', amount: '4900', currency: 'MAD', status: 1 } }
+});
 const secret = 'pri_sandbox_test';
 const digest = createHmac('sha256', secret).update(raw).digest();
 const hex = digest.toString('hex');

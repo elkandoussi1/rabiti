@@ -75,9 +75,14 @@ Deno.serve(async (req) => {
     return json({ error: "invalid_json" }, 400);
   }
 
-  const transaction = (payload.transaction ?? {}) as Record<string, unknown>;
+  /* YouCan Pay wraps the event as { id, event_name, sandbox, payload: { transaction } }.
+   * Keep accepting the flat shape older integrations send. */
+  const envelope = (payload.payload && typeof payload.payload === "object"
+    ? payload.payload
+    : payload) as Record<string, unknown>;
+  const transaction = (envelope.transaction ?? payload.transaction ?? {}) as Record<string, unknown>;
   const orderNo = String(
-    transaction.order_id ?? transaction.orderId ?? payload.order_id ?? "",
+    transaction.order_id ?? transaction.orderId ?? envelope.order_id ?? payload.order_id ?? "",
   ).trim();
   if (!orderNo || orderNo.length > 80) return json({ error: "invalid_order" }, 400);
 
@@ -126,22 +131,27 @@ Deno.serve(async (req) => {
     return json({ error: "invalid_signature" }, 401);
   }
 
-  const payloadSandbox = payload.sandbox ?? transaction.sandbox;
+  const payloadSandbox = payload.sandbox ?? envelope.sandbox ?? transaction.sandbox;
   if (typeof payloadSandbox === "boolean" && payloadSandbox !== (secret.sandbox === true)) {
     return json({ error: "sandbox_mismatch" }, 400);
   }
 
-  const event = String(payload.event ?? payload.type ?? "").toLowerCase();
+  const event = String(
+    payload.event_name ?? payload.event ?? payload.type ??
+    envelope.event_name ?? envelope.event ?? "",
+  ).toLowerCase();
   const status = String(transaction.status ?? "").toLowerCase();
   const isPaid = event === "transaction.paid" || event === "payment.paid" ||
     event === "paid" || status === "paid" || transaction.paid === true;
   if (!isPaid) return json({ ok: true, ignored: true });
 
   const amount = Number(
-    transaction.base_amount ?? payload.base_amount ?? transaction.amount ?? payload.amount,
+    transaction.base_amount ?? envelope.base_amount ?? payload.base_amount ??
+    transaction.amount ?? envelope.amount ?? payload.amount,
   );
   const currency = String(
-    transaction.base_currency ?? payload.base_currency ?? transaction.currency ?? payload.currency ?? "",
+    transaction.base_currency ?? envelope.base_currency ?? payload.base_currency ??
+    transaction.currency ?? envelope.currency ?? payload.currency ?? "",
   ).toUpperCase();
   if (!Number.isInteger(amount) || amount <= 0 || !/^[A-Z]{3}$/.test(currency)) {
     console.error("youcanpay-webhook: invalid amount or currency", { amount, currency });
