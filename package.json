@@ -1,8 +1,13 @@
 {
   "name": "rabiti",
   "private": true,
+  "type": "module",
   "scripts": {
-    "test": "node tests/database.cjs && node tests/paid.cjs && node tests/ui.cjs && node tests/paid-ui.cjs && node tests/checkout.cjs && node tests/commerce-ui.cjs"
+    "test": "node tests/schema.cjs && node tests/units.mjs && node tests/static.cjs && node tests/functions.cjs",
+    "test:schema": "node tests/schema.cjs",
+    "test:units": "node tests/units.mjs",
+    "test:static": "node tests/static.cjs",
+    "test:functions": "node tests/functions.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.9",

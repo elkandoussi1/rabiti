@@ -1,33 +1,43 @@
 # Verification
 
-Install development dependencies using `npm ci`, then run `npm test`.
-Runtime hosting is still static; npm is only needed for tests.
+Install dependencies and run the local suite:
 
-- `tests/database.cjs` executes schema.sql in PGlite (PostgreSQL WASM), creates
-  anonymous/authenticated roles and a simulated auth.uid(), and checks:
-  owner isolation, private drafts, public snapshots, denied direct public writes,
-  omitted secret/hidden product fields, revision conflicts, paid-product guard,
-  and owner-scoped unpublish.
-- `tests/ui.cjs` uses jsdom with a mocked Supabase client. It checks cloud editor
-  initialization, the publishing panel, save-before-publish, blocked publication
-  on conflicts, public product details/back, and unsafe link/style filtering.
+```sh
+npm ci
+npm test
+```
 
-These tests passed locally. They do not test real Supabase email delivery,
-OAuth/SMTP configuration, an installed phone PWA, or an actual hosted project.
-Browser visual testing was unavailable because the Chromium download failed.
-Complete the real-service checks in SETUP-AR.md before public rollout.
+The suite is intentionally split so a failure points at one layer.
 
-Paid delivery tests execute paid-delivery.sql and cover private sources/codes, redemption, same-receipt retries, second-browser rejection, owner-only code status, republishing without code reset, revocation, and unpublished products. UI tests cover manual checkout, lost-response retry, receipt preservation, and fast code generation.
+- `tests/schema.cjs` applies `supabase/schema.sql` then `supabase/v2.sql` in
+  PGlite. It covers publishing, secret exclusion, order creation, coupon
+  validation, download gating, manual payment confirmation, order status,
+  owner isolation, and statistics.
+- `tests/units.mjs` imports the shared modules with a small `window` shim and
+  checks draft normalization, product normalization, pricing helpers, slug
+  validation, and safe URL handling.
+- `tests/static.cjs` checks the shell files, PWA manifest, service-worker asset
+  list, release version, and that obsolete local-mode and checkout files are gone.
+- `tests/functions.cjs` checks the Edge Function source for the required
+  security properties: no private key in responses, order-token verification,
+  HMAC signature check, and service-role usage.
 
-External checkout: tests/checkout.cjs applies external-checkout.sql and verifies valid product URLs, forged/unsafe URL rejection, public secret exclusion, editor save, and customer purchase/details links. No real third-party payment or account activation was performed.
+These tests do not cover:
 
-Version 2.0: tests/paid-ui.cjs now checks the independent previous-purchase
-dialog, removal of the manual checkout wizard, lost-response retry, receipt
-preservation and repeat download. tests/commerce-ui.cjs checks automatic defaults,
-legacy product edits without mutating the saved draft, invalid-link save refusal,
-public export secret exclusion, retirement of manual payment settings, saving
-before applying updates, and no editor fallback for customer/unknown routes.
+- a real Supabase project, Auth email delivery, or RLS under real JWTs;
+- a real YouCan Pay sandbox/live payment;
+- Edge Function deployment;
+- an installed PWA on a phone;
+- cross-browser visual regression.
 
-Run all six test scripts with npm test. CI runs the same command on Node.js 22.
-The profile README is prepared under docs/profile; publishing it to the special
-username repository and changing account profile settings require GitHub access.
+Before production, complete the manual checks in `SETUP-AR.md` and
+`ACTIVATION-STATUS.md`. The browser QA checklist is:
+
+1. Register, confirm email, sign in, create a store.
+2. Add links, a paid product, and a manual payment method.
+3. Publish, open the store in a private window, create an order.
+4. Confirm the download is blocked, mark the order paid, download it.
+5. Apply a coupon and verify the total.
+6. Connect YouCan Pay sandbox, pay with `4242 4242 4242 4242`, verify the
+   webhook marks the order delivered.
+7. Resize to a phone viewport and test the dashboard and storefront.
