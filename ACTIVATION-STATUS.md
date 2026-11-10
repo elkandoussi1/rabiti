@@ -8,8 +8,8 @@
   لأن SMTP الحقيقي لم يُضبط بعد.
 - Edge Functions منشورتان بـ `--no-verify-jwt`:
   `youcanpay-tokenize` و`youcanpay-webhook`.
-- الكود على الفرع `feat/rabiti-v2`. فرع `main` ما زال يخدم النسخة القديمة (2.0)
-  حتى يتم الدمج.
+- دُمج الفرع `feat/rabiti-v2` في `main` ونُشر على GitHub Pages في 10 نوفمبر 2026:
+  <https://elkandoussi1.github.io/rabiti/> — الإصدار `2026.11.9.1` (Rabiti 2.1).
 
 ## ما تم التحقق منه على المشروع الحقيقي
 
@@ -36,9 +36,8 @@
    `https://bmiyixmiuminepmnmyjr.supabase.co/functions/v1/youcanpay-webhook`
    مع إضافة `elkandoussi1.github.io` و`localhost:8080` إلى الـ allowed hosts.
 3. ضبط SMTP حقيقي (Resend أو Brevo) ثم إعادة تفعيل تأكيد البريد.
-4. دمج `feat/rabiti-v2` في `main` ونشر GitHub Pages.
-5. تجربة دفع Sandbox كاملة ببطاقة اختبار من المتصفح.
-6. حذف مستخدمي الاختبار من `Authentication → Users` وإلغاء Access Token المؤقت.
+4. تجربة دفع Sandbox كاملة ببطاقة اختبار من المتصفح.
+5. حذف مستخدمي الاختبار من `Authentication → Users` وإلغاء Access Token المؤقت.
 
 ## ما لم يُختبر بعد
 
