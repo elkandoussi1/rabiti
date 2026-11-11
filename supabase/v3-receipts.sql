@@ -97,6 +97,11 @@ grant execute on function rabiti_private.rabiti_order_claim_paid(text,text,text,
 revoke all on function public.rabiti_order_claim_paid(text,text,text,text,text) from public, anon, authenticated;
 grant execute on function public.rabiti_order_claim_paid(text,text,text,text,text) to anon, authenticated, service_role;
 
+-- The Edge Function reads the order with the service role; these invoker
+-- functions only granted anon and authenticated before.
+grant execute on function rabiti_private.rabiti_order_status(text,text,text) to service_role;
+grant execute on function rabiti_private.rabiti_order_download(text,text,text,text) to service_role;
+
 -- ---------------------------------------------------------------------------
 -- Private bucket for receipts. 5 MB, images or PDF only.
 -- ---------------------------------------------------------------------------

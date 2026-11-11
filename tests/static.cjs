@@ -155,6 +155,7 @@ assert.match(sql, /create table if not exists public\.rabiti_payment_secrets/);
 assert.match(sql, /receipt_path text not null default ''/);
 assert.match(sql, /p_receipt text default null/);
 assert.match(sql, /'receipt_path', o\.receipt_path/);
+assert.match(sql, /grant execute on function\s+rabiti_private\.rabiti_order_status\(text,text,text\),\s+rabiti_private\.rabiti_order_download\(text,text,text,text\)\s+to service_role/);
 assert.equal(/create or replace function public\.rabiti_redeem/.test(sql), false);
 
 const tokenize = read('supabase/functions/youcanpay-tokenize/index.ts');

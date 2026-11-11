@@ -1056,6 +1056,13 @@ grant execute on function
   rabiti_private.rabiti_order_claim_paid(text,text,text,text,text)
 to anon, authenticated;
 
+-- The receipt Edge Function reads the order and its download links with the
+-- service role, which these two invoker functions did not grant before.
+grant execute on function
+  rabiti_private.rabiti_order_status(text,text,text),
+  rabiti_private.rabiti_order_download(text,text,text,text)
+to service_role;
+
 grant execute on function
   rabiti_private.rabiti_order_mark_paid(uuid),
   rabiti_private.rabiti_order_refund(uuid),
