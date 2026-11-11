@@ -39,8 +39,9 @@ async function boot() {
   window.addEventListener('beforeunload', (e) => { if (state.dirty) { e.preventDefault(); e.returnValue = ''; } });
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCommand(); }
-    if (e.key === 'Escape') closeUserMenu();
+    if (e.key === 'Escape') { closeUserMenu(); if (sidebarOpen()) closeSidebar(); }
   });
+  window.addEventListener('resize', () => { if (window.innerWidth > 980 && sidebarOpen()) closeSidebar(); });
 }
 
 function renderConfigError(msg = '') {
@@ -264,7 +265,7 @@ function renderShell() {
   const name = d.profile.name || state.store.slug;
   document.body.innerHTML = `<div class="shell">
     <aside class="sidebar" id="sidebar">
-      <div class="side-brand"><span class="logo-mark">${icon('link')}</span>رابطي</div>
+      <div class="side-brand"><span class="logo-mark">${icon('link')}</span>رابطي<button class="side-close" data-act="menu-close" aria-label="إغلاق القائمة">${icon('x', 'sm')}</button></div>
       <div class="side-store"><span class="av">${d.profile.avatar ? `<img src="${attr(d.profile.avatar)}" alt="">` : esc(initials(name, state.user?.email))}</span><div style="min-width:0"><b>${esc(name)}</b><span>/${esc(state.store.slug)}</span></div></div>
       ${NAV.map((sec) => `<div class="side-label">${sec.group}</div><nav class="side-nav">${sec.items.map(([v, label, ic]) => `<a href="#/${v}" data-nav="${v}" class="${state.view === v ? 'on' : ''}">${icon(ic)}<span>${label}</span>${v === 'orders' ? `<span class="badge hidden" id="orders-badge">0</span>` : ''}</a>`).join('')}</nav>`).join('')}
       <div class="side-foot">
@@ -272,6 +273,7 @@ function renderShell() {
         <div class="side-user" id="side-user"><span class="av">${esc(initials('', state.user?.email))}</span><div style="min-width:0"><b>${esc(state.user?.email?.split('@')[0] || 'حسابي')}</b><span>${esc(state.user?.email || '')}</span></div></div>
       </div>
     </aside>
+    <div class="side-scrim" data-act="menu-close" aria-hidden="true"></div>
     <div class="main">
       <header class="topbar">
         <button class="btn icon menu-btn" data-act="menu" aria-label="القائمة">${icon('menu')}</button>
@@ -290,6 +292,7 @@ function renderShell() {
   </div>
   <nav class="mobile-nav">${MOBILE_NAV.map(([v, label, ic]) => `<a href="#/${v}" data-nav="${v}" class="${state.view === v ? 'on' : ''}">${icon(ic)}<span>${label}</span></a>`).join('')}</nav>
   <div id="menu-root"></div>`;
+  document.body.classList.remove('nav-open');
   $('#side-user').onclick = openUserMenu;
   $('#top-avatar').onclick = openUserMenu;
   updateSaveState();
@@ -335,6 +338,22 @@ function openUserMenu() {
 function outsideUserMenu(e) { if (!e.target.closest('#user-menu') && !e.target.closest('#top-avatar') && !e.target.closest('#side-user')) closeUserMenu(); }
 function closeUserMenu() { $('#user-menu')?.remove(); }
 
+/* Mobile sidebar: the drawer slides over the page, so it needs its own way
+ * out (close button, scrim, Escape, navigating) and must stop the page from
+ * scrolling behind it. */
+function sidebarOpen() { return $('#sidebar')?.classList.contains('open') === true; }
+function closeSidebar() {
+  $('#sidebar')?.classList.remove('open');
+  $('.side-scrim')?.classList.remove('on');
+  document.body.classList.remove('nav-open');
+}
+function toggleSidebar() {
+  const side = $('#sidebar'); if (!side) return;
+  const open = side.classList.toggle('open');
+  $('.side-scrim')?.classList.toggle('on', open);
+  document.body.classList.toggle('nav-open', open);
+}
+
 function openAccount() {
   modal({
     title: 'حسابي', sub: 'بيانات الدخول والأمان', body: `
@@ -367,6 +386,7 @@ function route() {
   renderView();
 }
 function go(view, query = {}) {
+  closeSidebar();
   const q = new URLSearchParams(query).toString();
   location.hash = '#/' + view + (q ? '?' + q : '');
   if (state.view === view) { state.query = query; renderView(); }
@@ -837,7 +857,8 @@ document.addEventListener('click', async (e) => {
   if (!btn) return;
   if (btn.closest('#user-menu')) closeUserMenu();
   const act = btn.dataset.act;
-  if (act === 'menu') { $('#sidebar')?.classList.toggle('open'); return; }
+  if (act === 'menu') return toggleSidebar();
+  if (act === 'menu-close') return closeSidebar();
   if (act === 'command') return openCommand();
   if (act === 'publish') return publishNow(btn);
   if (act === 'open-store') { if (btn.tagName !== 'A') ctx.openStore(); return; }

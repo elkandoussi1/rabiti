@@ -133,6 +133,8 @@ svg{flex:none}
 .sidebar::-webkit-scrollbar{width:6px}.sidebar::-webkit-scrollbar-thumb{background:#243049;border-radius:6px}
 .side-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px;color:#fff;font-weight:900;font-size:17px;letter-spacing:-.02em}
 .side-brand .logo-mark{width:36px;height:36px;border-radius:11px}
+.side-close{display:none}
+.side-scrim{display:none}
 .side-store{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:11px;display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .side-store .av{width:34px;height:34px;border-radius:10px;background:linear-gradient(145deg,#2dd4bf,#0f766e);color:#042f2e;display:grid;place-items:center;font-weight:900;font-size:14px;flex:none;overflow:hidden}
 .side-store .av img{width:100%;height:100%;object-fit:cover}
@@ -406,9 +408,14 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
 .mobile-nav{display:none}
 @media(max-width:980px){
   .shell{grid-template-columns:1fr}
-  .sidebar{position:fixed;inset-block:0;inset-inline-start:0;width:270px;transform:translateX(100%);transition:.25s;box-shadow:var(--shadow-lg)}
+  .sidebar{position:fixed;inset-block:0;inset-inline-start:0;width:min(300px,84vw);transform:translateX(100%);transition:transform .25s;box-shadow:var(--shadow-lg)}
   [dir=ltr] .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:none}
+  .side-close{display:inline-flex;align-items:center;justify-content:center;margin-inline-start:auto;width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e2e8f0;flex:none}
+  .side-close:hover{background:rgba(255,255,255,.14);color:#fff}
+  .side-scrim{display:block;position:fixed;inset:0;z-index:39;background:rgba(8,13,24,.55);opacity:0;pointer-events:none;transition:opacity .25s}
+  .side-scrim.on{opacity:1;pointer-events:auto}
+  body.nav-open{overflow:hidden}
   .menu-btn{display:inline-flex}
   .topbar{padding:0 16px;height:62px}
   .content{padding:20px 16px 90px}
