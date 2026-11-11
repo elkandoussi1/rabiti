@@ -429,3 +429,11 @@ export async function claimPaid(slug, orderNo, token, ref) {
   if (error) throw error;
   return !!data;
 }
+/* Signed, short-lived link to a receipt in the private bucket. */
+export async function receiptUrl(path) {
+  initClient();
+  if (!path) return '';
+  const { data, error } = await client.storage.from('rabiti-receipts').createSignedUrl(path, 600);
+  if (error) throw error;
+  return data?.signedUrl || '';
+}

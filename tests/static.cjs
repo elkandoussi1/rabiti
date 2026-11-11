@@ -25,9 +25,10 @@ const required = [
   'index.html', 'public.html', 'app.js', 'views.js', 'api.js', 'ui.js', 'public.js',
   'app.css', 'store.css', 'sw.js', 'app-update.js', 'manifest.webmanifest', 'release.json',
   'config.js', 'supabase.min.js', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png',
-  'supabase/schema.sql', 'supabase/v2.sql',
+  'supabase/schema.sql', 'supabase/v2.sql', 'supabase/v3-receipts.sql',
   'supabase/functions/youcanpay-tokenize/index.ts',
   'supabase/functions/youcanpay-webhook/index.ts',
+  'supabase/functions/rabiti-receipt/index.ts',
   'tests/schema.cjs', 'tests/units.mjs', 'tests/static.cjs', 'tests/functions.cjs',
   'README.md', 'SETUP-AR.md', 'AUTOMATIC-PAYMENTS.md', 'TESTING.md', 'CHANGELOG.md',
   'SECURITY-STATUS.md', 'ACTIVATION-STATUS.md', 'CONTRIBUTING.md', 'THIRD-PARTY.txt'
@@ -136,6 +137,8 @@ assert.match(storefront, /youcanpay-tokenize/);
 assert.match(storefront, /elements\.confirm\(\)/);
 assert.match(storefront, /result\?\.status === 'succeeded'/);
 assert.match(storefront, /safeUrl/);
+assert.match(storefront, /functions\/v1\/rabiti-receipt/);
+assert.match(storefront, /claim-file/);
 assert.equal(/gumroad|Gumroad/.test(storefront), false);
 
 /* ---------------- SQL and Edge Function surface ---------------- */
@@ -149,6 +152,9 @@ assert.match(sql, /PAYMENT_METHOD_REQUIRED/);
 assert.match(sql, /INVALID_COUPON/);
 assert.match(sql, /create table if not exists public\.rabiti_orders/);
 assert.match(sql, /create table if not exists public\.rabiti_payment_secrets/);
+assert.match(sql, /receipt_path text not null default ''/);
+assert.match(sql, /p_receipt text default null/);
+assert.match(sql, /'receipt_path', o\.receipt_path/);
 assert.equal(/create or replace function public\.rabiti_redeem/.test(sql), false);
 
 const tokenize = read('supabase/functions/youcanpay-tokenize/index.ts');
@@ -164,6 +170,24 @@ assert.match(webhook, /HMAC/);
 assert.match(webhook, /transaction\.paid/);
 assert.match(webhook, /rabiti_confirm_payment/);
 assert.match(webhook, /p_event_id/);
+
+/* ---------------- receipt upload function ---------------- */
+const receipt = read('supabase/functions/rabiti-receipt/index.ts');
+assert.match(receipt, /Deno\.serve/);
+assert.match(receipt, /req\.method === "OPTIONS"/);
+assert.match(receipt, /req\.method !== "POST"/);
+assert.match(receipt, /req\.formData\(\)/);
+assert.match(receipt, /\^\[a-f0-9\]\{64\}\$/);
+assert.match(receipt, /5 \* 1024 \* 1024/);
+assert.match(receipt, /rabiti_order_status/);
+assert.match(receipt, /order\.status !== "pending"/);
+assert.match(receipt, /storage\/v1\/object\/rabiti-receipts/);
+assert.match(receipt, /x-upsert/);
+assert.match(receipt, /p_receipt: path/);
+assert.match(receipt, /method: "DELETE"/);
+assert.match(receipt, /authHeaders\(serviceKey\)/);
+assert.equal(receipt.includes('Authorization: `Bearer ${serviceKey}`'), false);
+assert.equal(/console\.(?:log|info|debug)/.test(receipt), false);
 
 /* ---------------- package scripts ---------------- */
 const pkg = JSON.parse(read('package.json'));

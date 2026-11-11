@@ -6,6 +6,8 @@ import {
 import * as api from './api.js';
 
 const cfg = window.RABITI_CONFIG || {};
+const RECEIPT_MAX_BYTES = 5 * 1024 * 1024;
+const RECEIPT_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'application/pdf'];
 const params = new URLSearchParams(location.search);
 const state = {
   slug: params.get('store') || '',
@@ -45,6 +47,10 @@ const STR = {
     secure: 'دفع آمن · تسليم رقمي فوري', summary: 'ملخص الطلب', yourOrder: 'طلبك', orderNo: 'رقم الطلب',
     status: 'الحالة', date: 'التاريخ', items: 'المنتجات', instructions: 'تعليمات الدفع', claim: 'أبلغت عن الدفع',
     claimRef: 'مرجع التحويل أو ملاحظة', claimSent: 'وصلنا إشعارك. سنؤكد الدفع قريبًا.', downloads: 'تحميلاتك',
+    attachReceipt: 'إرفاق إيصال الدفع', receiptHint: 'اختياري · صورة أو PDF حتى 5 م.ب',
+    receiptAttached: 'أُرفق الإيصال مع الطلب.', receiptTooBig: 'حجم الإيصال أكبر من 5 م.ب.',
+    receiptType: 'الصيغة غير مدعومة. استخدم صورة أو PDF.', uploading: 'جارٍ رفع الإيصال…',
+    receiptFailed: 'تعذّر رفع الإيصال. حاول مرة أخرى أو أرسله على واتساب.',
     pending: 'بانتظار الدفع', paid: 'مدفوع', delivered: 'تم التسليم', cancelled: 'ملغى', refunded: 'مسترجع', failed: 'فشل',
     track: 'تتبع طلبك', trackHint: 'أدخل رقم الطلب والرمز الموجود في رابط الطلب.', trackBtn: 'تتبع',
     storeNotFound: 'المتجر غير موجود', storeNotFoundText: 'تأكد من الرابط أو اطلب من صاحب المتجر رابطًا جديدًا.',
@@ -90,6 +96,10 @@ const STR = {
     secure: 'Secure payment · instant digital delivery', summary: 'Order summary', yourOrder: 'Your order', orderNo: 'Order no.',
     status: 'Status', date: 'Date', items: 'Items', instructions: 'Payment instructions', claim: 'I have paid',
     claimRef: 'Transfer reference or note', claimSent: 'We received your note. We will confirm shortly.', downloads: 'Your downloads',
+    attachReceipt: 'Attach payment receipt', receiptHint: 'Optional · image or PDF up to 5 MB',
+    receiptAttached: 'Receipt attached to the order.', receiptTooBig: 'The receipt is larger than 5 MB.',
+    receiptType: 'Unsupported format. Use an image or PDF.', uploading: 'Uploading receipt…',
+    receiptFailed: 'Could not upload the receipt. Try again or send it on WhatsApp.',
     pending: 'Pending payment', paid: 'Paid', delivered: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded', failed: 'Failed',
     track: 'Track your order', trackHint: 'Enter the order number and the token from your order link.', trackBtn: 'Track',
     storeNotFound: 'Store not found', storeNotFoundText: 'Check the link or ask the store owner for a new one.',
@@ -135,6 +145,10 @@ const STR = {
     secure: 'Paiement sécurisé · livraison numérique immédiate', summary: 'Récapitulatif', yourOrder: 'Votre commande', orderNo: 'N° de commande',
     status: 'Statut', date: 'Date', items: 'Articles', instructions: 'Instructions de paiement', claim: "J'ai payé",
     claimRef: 'Référence du virement ou note', claimSent: 'Nous avons reçu votre note. Confirmation en cours.', downloads: 'Vos téléchargements',
+    attachReceipt: 'Joindre le reçu', receiptHint: 'Facultatif · image ou PDF jusqu’à 5 Mo',
+    receiptAttached: 'Reçu joint à la commande.', receiptTooBig: 'Le reçu dépasse 5 Mo.',
+    receiptType: 'Format non pris en charge. Utilisez une image ou un PDF.', uploading: 'Envoi du reçu…',
+    receiptFailed: 'Impossible d’envoyer le reçu. Réessayez ou envoyez-le sur WhatsApp.',
     pending: 'En attente de paiement', paid: 'Payé', delivered: 'Livré', cancelled: 'Annulé', refunded: 'Remboursé', failed: 'Échoué',
     track: 'Suivre votre commande', trackHint: 'Saisissez le numéro et le jeton de votre lien de commande.', trackBtn: 'Suivre',
     storeNotFound: 'Boutique introuvable', storeNotFoundText: 'Vérifiez le lien ou demandez-en un nouveau au propriétaire.',
@@ -547,7 +561,7 @@ async function orderHTML() {
   return `${topbar()}<div class="wrap s-order"><a class="s-back" href="${attr(homeUrl())}" data-s-act="home">${icon('arrow-left', 'sm')} ${t('backStore')}</a>
     <div class="s-order-card"><div class="s-order-head"><div class="status-ico ${statusClass(o.status)}">${icon(ico, 'lg')}</div><h1>${esc(title)}</h1><p>${paid ? t('paidSuccess') : o.status === 'pending' ? t('payInstructions') : t('orderClosed')}</p><span class="onum">${esc(o.order_no)}</span></div>
       <div class="s-order-body">
-        ${o.status === 'pending' ? `<h3>${t('instructions')}</h3>${o.payment_method === 'youcanpay' ? `<div class="s-instructions"><b>${t('cardPay')}</b>${t('payWindow')}${ycp().sandbox ? `<br><br>${t('sandboxCards')}` : ''}</div><button class="s-btn fill" style="margin-top:10px;width:100%" data-s-act="retry-pay">${icon('card', 'sm')} ${t('retryPay')}</button>` : `<div class="s-instructions"><b>${esc(method?.t || methodName(o.payment_method))}</b>${esc(method?.d || '')}${method?.u ? `<br><a href="${attr(linkHref(method.u))}" target="_blank" rel="noopener" style="color:var(--s-accent);font-weight:800">${t('open')}</a>` : ''}${state.payload.checkout?.note ? `<br><br>${esc(state.payload.checkout.note)}` : ''}${t('pendingNote') ? `<br><br>${esc(t('pendingNote'))}` : ''}</div><form id="claim-form" class="s-claim"><input id="claim-ref" placeholder="${t('claimRef')}" maxlength="500"><button type="submit">${t('claim')}</button></form>`}` : ''}
+        ${o.status === 'pending' ? `<h3>${t('instructions')}</h3>${o.payment_method === 'youcanpay' ? `<div class="s-instructions"><b>${t('cardPay')}</b>${t('payWindow')}${ycp().sandbox ? `<br><br>${t('sandboxCards')}` : ''}</div><button class="s-btn fill" style="margin-top:10px;width:100%" data-s-act="retry-pay">${icon('card', 'sm')} ${t('retryPay')}</button>` : `<div class="s-instructions"><b>${esc(method?.t || methodName(o.payment_method))}</b>${esc(method?.d || '')}${method?.u ? `<br><a href="${attr(linkHref(method.u))}" target="_blank" rel="noopener" style="color:var(--s-accent);font-weight:800">${t('open')}</a>` : ''}${state.payload.checkout?.note ? `<br><br>${esc(state.payload.checkout.note)}` : ''}${t('pendingNote') ? `<br><br>${esc(t('pendingNote'))}` : ''}</div><form id="claim-form" class="s-claim"><input id="claim-ref" placeholder="${t('claimRef')}" maxlength="500"><button type="submit">${t('claim')}</button><label class="s-file"><input type="file" id="claim-file" accept="image/jpeg,image/png,image/webp,image/heic,application/pdf">${icon('upload', 'sm')}<span class="s-file-txt"><b>${t('attachReceipt')}</b> <span id="claim-file-name">${t('receiptHint')}</span></span></label></form>${o.receipt_path ? `<div class="s-receipt-ok">${icon('check', 'sm')} ${t('receiptAttached')}</div>` : ''}`}` : ''}
         ${paid ? `<h3>${t('downloads')}</h3><div class="s-downloads">${(o.items || []).map((it) => { const d = downloads[it.id]; return `<div class="s-download"><span class="ic-tile">${icon('file', 'sm')}</span><div style="flex:1;min-width:0"><b>${esc(it.title || it.id)}</b><span>${d ? esc(d.filename || '') : t('noDownloads')}</span></div>${d ? `<a class="s-btn fill" href="${attr(d.url)}" ${/^data:/i.test(d.url) ? `download="${attr(d.filename || 'file')}"` : 'target="_blank" rel="noopener"'} data-s-act="download-file">${icon('download', 'sm')} ${t('download')}</a>` : ''}</div>`; }).join('')}</div>` : ''}
         <h3 style="margin-top:22px">${t('orderItems')}</h3><div class="s-order-lines">${(o.items || []).map((it) => `<div class="s-order-line"><div style="flex:1;min-width:0"><b>${esc(it.title || it.id)}</b><div class="q">${it.qty} × ${money(it.price_minor, o.currency, state.lang)}</div></div><span class="amt">${money(Number(it.price_minor) * Number(it.qty), o.currency, state.lang)}</span></div>`).join('')}</div>
         <div class="s-order-totals"><div class="r"><span>${t('subtotal')}</span><b>${money(o.subtotal_minor, o.currency, state.lang)}</b></div>${o.discount_minor ? `<div class="r"><span>${t('discount')} ${o.coupon ? `(${esc(o.coupon)})` : ''}</span><b style="color:var(--s-accent)">− ${money(o.discount_minor, o.currency, state.lang)}</b></div>` : ''}<div class="r total"><span>${t('total')}</span><span>${money(o.total_minor, o.currency, state.lang)}</span></div></div>
@@ -750,13 +764,50 @@ document.addEventListener('input', (e) => {
 });
 document.addEventListener('change', (e) => {
   if (e.target.name === 'co-method') state.checkoutMethod = e.target.value;
+  if (e.target.id === 'claim-file') {
+    const name = e.target.files?.[0]?.name || '';
+    const label = document.getElementById('claim-file-name');
+    if (label) label.textContent = name || t('receiptHint');
+  }
 });
 document.addEventListener('submit', async (e) => {
   if (e.target.id === 'checkout-form') { e.preventDefault(); await submitCheckout(e); }
   if (e.target.id === 'claim-form') {
     e.preventDefault();
+    const form = e.target;
     const ref = $('#claim-ref')?.value.trim() || '';
-    try { await api.claimPaid(state.slug, state.orderNo, state.orderToken, ref); sToast(t('claimSuccess'), 4500); e.target.innerHTML = `<div class="s-instructions">${t('claimSuccess')}</div>`; }
+    const file = $('#claim-file')?.files?.[0] || null;
+    const button = form.querySelector('button[type="submit"]');
+    const done = (msg) => { form.innerHTML = `<div class="s-instructions">${msg}</div>`; };
+    if (file) {
+      if (file.size > RECEIPT_MAX_BYTES) return sToast(t('receiptTooBig'), 4000);
+      if (!RECEIPT_TYPES.includes(String(file.type || '').toLowerCase())) return sToast(t('receiptType'), 4000);
+      const label = button.textContent;
+      button.disabled = true;
+      button.textContent = t('uploading');
+      try {
+        const body = new FormData();
+        body.append('slug', state.slug);
+        body.append('order_no', state.orderNo);
+        body.append('token', state.orderToken);
+        body.append('ref', ref);
+        body.append('file', file);
+        const res = await fetch(`${String(cfg.supabaseUrl || '').replace(/\/$/, '')}/functions/v1/rabiti-receipt`, {
+          method: 'POST',
+          headers: { apikey: cfg.supabasePublishableKey || '', Authorization: `Bearer ${cfg.supabasePublishableKey || ''}` },
+          body
+        });
+        if (!res.ok) throw new Error('upload_failed');
+        sToast(t('claimSent'), 4500);
+        done(`${t('claimSent')} ${t('receiptAttached')}`);
+      } catch {
+        button.disabled = false;
+        button.textContent = label;
+        sToast(t('receiptFailed'), 4500);
+      }
+      return;
+    }
+    try { await api.claimPaid(state.slug, state.orderNo, state.orderToken, ref); sToast(t('claimSuccess'), 4500); done(t('claimSuccess')); }
     catch (err) { sToast(api.errorText(err), 4000); }
   }
   if (e.target.id === 'track-form') {

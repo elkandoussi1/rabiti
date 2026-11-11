@@ -779,9 +779,9 @@ async function openOrderDrawer(id) {
     d.box.querySelector('.drawer-head').innerHTML = `<div style="flex:1"><h3>${esc(o.order_no)}</h3><p>${esc(fmt(o.created_at))} · ${esc(o.buyer_name)}</p></div><button class="close-x" data-close>${icon('x')}</button>`;
     d.box.querySelector('.drawer-body').innerHTML = `
       <div class="order-hero"><div class="row between"><div><div class="num">${esc(o.order_no)}</div><div class="total">${money(o.total_minor, o.currency)}</div></div>${statusChipHtml(o.status)}</div>
-        <div class="row" style="margin-top:12px;flex-wrap:wrap"><button class="btn sm" data-order-paid ${canPay ? '' : 'disabled'}>${icon('check', 'sm')} تأكيد الدفع</button><button class="btn sm" data-order-cancel ${canCancel ? '' : 'disabled'}>${icon('ban', 'sm')} إلغاء</button><button class="btn sm danger" data-order-refund ${canRefund ? '' : 'disabled'}>${icon('undo', 'sm')} استرجاع</button></div></div>
+        <div class="row" style="margin-top:12px;flex-wrap:wrap"><button class="btn sm" data-order-paid ${canPay ? '' : 'disabled'}>${icon('check', 'sm')} تأكيد الدفع</button><button class="btn sm" data-order-cancel ${canCancel ? '' : 'disabled'}>${icon('ban', 'sm')} إلغاء</button><button class="btn sm danger" data-order-refund ${canRefund ? '' : 'disabled'}>${icon('undo', 'sm')} استرجاع</button>${o.receipt_path ? `<button class="btn sm" data-receipt>${icon('receipt', 'sm')} عرض الإيصال</button>` : ''}</div></div>
       <div class="grid c2" style="gap:14px">
-        <div class="card pad"><h3 style="margin:0 0 9px;font-size:13px">الزبون</h3><dl class="kv"><dt>الاسم</dt><dd>${esc(o.buyer_name)}</dd><dt>البريد</dt><dd style="direction:ltr;text-align:start">${esc(o.buyer_email)}</dd><dt>الهاتف</dt><dd style="direction:ltr;text-align:start">${esc(o.buyer_phone || '—')}</dd><dt>طريقة الدفع</dt><dd>${esc(payMethod.t || o.payment_method)}</dd></dl></div>
+        <div class="card pad"><h3 style="margin:0 0 9px;font-size:13px">الزبون</h3><dl class="kv"><dt>الاسم</dt><dd>${esc(o.buyer_name)}</dd><dt>البريد</dt><dd style="direction:ltr;text-align:start">${esc(o.buyer_email)}</dd><dt>الهاتف</dt><dd style="direction:ltr;text-align:start">${esc(o.buyer_phone || '—')}</dd><dt>طريقة الدفع</dt><dd>${esc(payMethod.t || o.payment_method)}</dd><dt>المرجع</dt><dd style="direction:ltr;text-align:start">${esc(o.payment_ref || '—')}</dd></dl></div>
         <div class="card pad"><h3 style="margin:0 0 9px;font-size:13px">الطلب</h3><dl class="kv"><dt>التاريخ</dt><dd>${esc(fmt(o.created_at))}</dd><dt>الدفع</dt><dd>${o.paid_at ? esc(fmt(o.paid_at)) : '—'}</dd><dt>التسليم</dt><dd>${o.delivered_at ? esc(fmt(o.delivered_at)) : '—'}</dd><dt>الخصم</dt><dd>${o.discount_minor ? money(o.discount_minor, o.currency) + (o.coupon ? ` (${esc(o.coupon)})` : '') : '—'}</dd></dl></div>
       </div>
       <h3 style="font-size:13px;margin:20px 0 8px">المنتجات</h3>
@@ -799,6 +799,16 @@ async function openOrderDrawer(id) {
     d.box.querySelector('[data-order-cancel]')?.addEventListener('click', async () => { if (!(await confirmDialog({ title: 'إلغاء الطلب', text: 'سيُغلق الطلب ولن يستطيع الزبون الدفع.', confirm: 'إلغاء الطلب', danger: true }))) return; try { await api.cancelOrder(o.id); toast('أُلغي الطلب', 'ok'); uiClose(); renderView(); refreshStats(); } catch (e) { toast(api.errorText(e), 'err'); } });
     d.box.querySelector('[data-order-refund]')?.addEventListener('click', async () => { if (!(await confirmDialog({ title: 'استرجاع الطلب', text: 'سيُعلَّم الطلب كمسترجع ويتوقف الوصول إلى التحميل.', confirm: 'استرجاع', danger: true }))) return; try { await api.refundOrder(o.id); toast('تم الاسترجاع', 'ok'); uiClose(); renderView(); refreshStats(); } catch (e) { toast(api.errorText(e), 'err'); } });
     d.box.querySelector('[data-order-note]')?.addEventListener('click', async () => { try { await api.noteOrder(o.id, d.box.querySelector('#order-note').value); toast('حُفظت الملاحظة', 'ok'); } catch (e) { toast(api.errorText(e), 'err'); } });
+    d.box.querySelector('[data-receipt]')?.addEventListener('click', async (ev) => {
+      const button = ev.currentTarget;
+      button.disabled = true;
+      try {
+        const url = await api.receiptUrl(o.receipt_path);
+        if (!url) throw new Error('missing receipt');
+        window.open(url, '_blank', 'noopener');
+      } catch (e) { toast(api.errorText(e), 'err'); }
+      button.disabled = false;
+    });
   } catch (e) {
     d.box.querySelector('.drawer-body').innerHTML = `<div class="callout rose">${icon('alert')}<div>${esc(api.errorText(e))}</div></div>`;
   }

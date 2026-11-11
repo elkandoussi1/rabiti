@@ -159,6 +159,7 @@ create table if not exists public.rabiti_orders (
   status text not null default 'pending' check (status in ('pending','paid','delivered','cancelled','refunded','failed')),
   payment_method text not null default '',
   payment_ref text not null default '',
+  receipt_path text not null default '',
   provider text not null default '',
   provider_ref text not null default '',
   notes text not null default '',
@@ -652,6 +653,7 @@ begin
     'coupon', o.coupon,
     'payment_method', o.payment_method,
     'payment_ref', o.payment_ref,
+    'receipt_path', o.receipt_path,
     'created_at', o.created_at,
     'paid_at', o.paid_at,
     'delivered_at', o.delivered_at,
@@ -692,21 +694,32 @@ begin
 end $$;
 
 create or replace function rabiti_private.rabiti_order_claim_paid(
-  p_slug text, p_order_no text, p_token text, p_ref text
+  p_slug text, p_order_no text, p_token text, p_ref text, p_receipt text default null
 ) returns boolean
 language plpgsql security definer set search_path='' as $$
-declare o public.rabiti_orders;
+declare
+  o public.rabiti_orders;
+  v_ref text := left(coalesce(p_ref,''),500);
+  v_receipt text := nullif(left(btrim(coalesce(p_receipt,'')),400),'');
 begin
   if coalesce(p_token,'') !~ '^[a-f0-9]{64}$' then return false; end if;
+  if v_receipt is not null and v_receipt !~ '^[a-z0-9][a-z0-9-]{0,39}/RB-[A-Z0-9]{10}/[A-Za-z0-9._-]{1,120}$' then
+    return false;
+  end if;
   select * into o from public.rabiti_orders
   where store_slug = p_slug and order_no = p_order_no and access_token = p_token for update;
   if not found or o.status <> 'pending' then return false; end if;
   update public.rabiti_orders
-  set payment_ref = left(coalesce(p_ref,''),500),
-      metadata = metadata || jsonb_build_object('buyer_claimed_paid', true, 'claimed_at', now())
+  set payment_ref = v_ref,
+      receipt_path = coalesce(v_receipt, receipt_path),
+      metadata = metadata || jsonb_build_object(
+        'buyer_claimed_paid', true,
+        'claimed_at', now(),
+        'receipt', coalesce(v_receipt, receipt_path)
+      )
   where id = o.id;
   insert into public.rabiti_order_events(order_id, type, data)
-  values(o.id, 'buyer_claimed_paid', jsonb_build_object('ref', left(coalesce(p_ref,''),500)));
+  values(o.id, 'buyer_claimed_paid', jsonb_build_object('ref', v_ref, 'receipt', v_receipt));
   return true;
 end $$;
 
@@ -922,9 +935,9 @@ create or replace function public.rabiti_order_download(p_slug text, p_order_no 
 returns jsonb language sql security invoker set search_path='' as $$
   select rabiti_private.rabiti_order_download(p_slug,p_order_no,p_token,p_product_id)
 $$;
-create or replace function public.rabiti_order_claim_paid(p_slug text, p_order_no text, p_token text, p_ref text)
+create or replace function public.rabiti_order_claim_paid(p_slug text, p_order_no text, p_token text, p_ref text, p_receipt text default null)
 returns boolean language sql security invoker set search_path='' as $$
-  select rabiti_private.rabiti_order_claim_paid(p_slug,p_order_no,p_token,p_ref)
+  select rabiti_private.rabiti_order_claim_paid(p_slug,p_order_no,p_token,p_ref,p_receipt)
 $$;
 create or replace function public.rabiti_order_mark_paid(p_order_id uuid)
 returns jsonb language sql security invoker set search_path='' as $$
@@ -1016,7 +1029,7 @@ revoke all on function
   rabiti_private.rabiti_create_order(text,jsonb,jsonb,text,text),
   rabiti_private.rabiti_order_status(text,text,text),
   rabiti_private.rabiti_order_download(text,text,text,text),
-  rabiti_private.rabiti_order_claim_paid(text,text,text,text),
+  rabiti_private.rabiti_order_claim_paid(text,text,text,text,text),
   rabiti_private.rabiti_order_mark_paid(uuid),
   rabiti_private.rabiti_order_refund(uuid),
   rabiti_private.rabiti_order_cancel(uuid),
@@ -1040,7 +1053,7 @@ grant execute on function
   rabiti_private.rabiti_create_order(text,jsonb,jsonb,text,text),
   rabiti_private.rabiti_order_status(text,text,text),
   rabiti_private.rabiti_order_download(text,text,text,text),
-  rabiti_private.rabiti_order_claim_paid(text,text,text,text)
+  rabiti_private.rabiti_order_claim_paid(text,text,text,text,text)
 to anon, authenticated;
 
 grant execute on function
@@ -1069,7 +1082,7 @@ revoke all on function
   public.rabiti_create_order(text,jsonb,jsonb,text,text),
   public.rabiti_order_status(text,text,text),
   public.rabiti_order_download(text,text,text,text),
-  public.rabiti_order_claim_paid(text,text,text,text),
+  public.rabiti_order_claim_paid(text,text,text,text,text),
   public.rabiti_order_mark_paid(uuid),
   public.rabiti_order_refund(uuid),
   public.rabiti_order_cancel(uuid),
@@ -1086,7 +1099,7 @@ grant execute on function
   public.rabiti_create_order(text,jsonb,jsonb,text,text),
   public.rabiti_order_status(text,text,text),
   public.rabiti_order_download(text,text,text,text),
-  public.rabiti_order_claim_paid(text,text,text,text)
+  public.rabiti_order_claim_paid(text,text,text,text,text)
 to anon, authenticated;
 
 grant execute on function
