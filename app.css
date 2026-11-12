@@ -124,6 +124,10 @@ svg{flex:none}
 .form-ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:14px}
 .auth-alt{text-align:center;margin-top:18px;font-size:13.5px;color:var(--muted)}
 .auth-alt button{border:0;background:none;color:var(--accent-ink);font-weight:800;padding:0}
+.auth-install{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.auth-install .hint{text-align:center;margin:8px 0 0;font-size:12px;color:var(--muted)}
+.install-steps{margin:0;padding-inline-start:20px;font-size:14px;line-height:1.9;color:var(--ink-2)}
+.install-steps li{margin:2px 0}
 .auth-foot{text-align:center;font-size:12px;color:var(--muted-2);margin-top:30px}
 .auth-foot a{text-decoration:underline;text-underline-offset:3px}
 @media(max-width:900px){.auth{grid-template-columns:1fr}.auth-art{display:none}.auth-card .brand-sm{display:flex}.auth-panel{padding:28px 20px;align-items:flex-start}.auth-card{padding-top:12px}}
@@ -250,7 +254,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
 .item-card .handle:hover{background:var(--line-2);color:var(--muted)}
 .item-card .body{flex:1;min-width:0}
 .item-card .body b{display:block;font-size:13.5px;line-height:1.35}
-.item-card .body span{display:block;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:460px}
+.item-card .body>span{display:block;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:460px}
 .item-card .ic-tile{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--line-2);color:var(--ink-2);flex:none}
 .item-card .ic-tile img{width:100%;height:100%;object-fit:cover;border-radius:10px}
 .item-card .tools{display:flex;gap:3px;align-items:center}
@@ -433,7 +437,8 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
   .topbar h1{font-size:16px}
   .top-actions{gap:6px}
   .hide-sm{display:none}
-  #save-state{font-size:10.5px;padding:3px 7px}
+  #save-state{font-size:0;gap:0;padding:5px;overflow:hidden}
+  #save-state .dot{width:6px;height:6px}
   .top-avatar{width:32px;height:32px;font-size:11px}
   .top-actions .btn.sm{padding:6px 9px;font-size:12.5px}
   .page-head h2{font-size:21px}
@@ -444,12 +449,15 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
   .modal{padding:10px}
   .modal-box{max-height:calc(100dvh - 20px)}
 }
+@media(max-width:560px){
+  .item-card{flex-wrap:wrap}
+  .item-card .tools{width:100%;justify-content:flex-end;padding-top:8px;margin-top:2px;border-top:1px solid var(--line-2)}
+}
 @media(max-width:380px){
   .topbar{padding:0 10px;gap:6px}
   .top-actions{gap:4px}
   .top-actions .btn.sm{padding:6px 8px;font-size:12px}
   .top-actions [data-act="open-store"]{display:none}
-  #save-state{font-size:10px;padding:3px 6px}
   .top-avatar{width:30px;height:30px;font-size:10.5px}
   .menu-btn{padding:8px}
 }

@@ -1,5 +1,5 @@
 /* Rabiti service worker: app shell offline, fresh files when online. */
-const CACHE = "rabiti-v13-v2";
+const CACHE = "rabiti-v14-v2";
 const ASSETS = [
   "./index.html",
   "./public.html",

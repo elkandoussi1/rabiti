@@ -69,9 +69,14 @@ function renderAuth(mode = 'login', msg = '') {
     <div class="auth-panel"><div class="auth-card">
       <div class="brand-sm"><span class="logo-mark">${icon('link')}</span>رابطي</div>
       ${authForm(mode, msg)}
+      <div class="auth-install hidden" data-install-app>
+        <button type="button" class="btn block" data-act="install-app">${icon('download', 'sm')} تثبيت رابطي على جهازك</button>
+        <p class="hint">يعمل كتطبيق مستقل ويفتح أسرع.</p>
+      </div>
       <p class="auth-foot">بالمتابعة أنت توافق على استخدام حسابك فقط لإنشاء متجرك. <a href="README.md">ما هو رابطي؟</a></p>
     </div></div></div>`;
   bindAuth(mode);
+  syncInstall();
 }
 
 function authForm(mode, msg) {
@@ -282,6 +287,7 @@ function renderShell() {
         <div class="top-actions">
           <button class="searchbox" data-act="command" aria-label="بحث سريع"><span class="ic">${icon('search')}</span><input placeholder="بحث سريع…  ⌘K" readonly></button>
           <span class="chip hidden" id="save-state"></span>
+          <button class="btn sm hidden" data-act="install-app" data-install-app aria-label="تثبيت التطبيق" title="تثبيت التطبيق">${icon('download', 'sm')}<span class="hide-sm"> تثبيت</span></button>
           <a class="btn sm" href="${attr(storeUrl(state.store.slug))}" target="_blank" rel="noopener" data-act="open-store">${icon('external', 'sm')} <span class="hide-sm">المتجر</span></a>
           <button class="btn primary sm" data-act="publish" id="publish-btn">${icon('rocket', 'sm')} نشر</button>
           <button class="top-avatar" id="top-avatar" aria-label="الحساب">${esc(initials(d.profile.name, state.user?.email))}</button>
@@ -296,6 +302,7 @@ function renderShell() {
   $('#side-user').onclick = openUserMenu;
   $('#top-avatar').onclick = openUserMenu;
   updateSaveState();
+  syncInstall();
 }
 
 function syncChrome() {
@@ -859,6 +866,65 @@ function openImport() {
   input.click();
 }
 
+/* ============================== install ============================== */
+let installPrompt = null;
+let appInstalled = false;
+const isStandalone = () => window.matchMedia?.('(display-mode: standalone)').matches === true || navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+function syncInstall() {
+  const show = !appInstalled && !isStandalone();
+  $$('[data-install-app]').forEach((el) => el.classList.toggle('hidden', !show));
+}
+
+function installHelp() {
+  const ios = isIOS();
+  const steps = ios
+    ? `<ol class="install-steps"><li>افتح رابطي في <b>Safari</b>.</li><li>اضغط زر المشاركة في شريط Safari.</li><li>اختر <b>«إضافة إلى الشاشة الرئيسية»</b> ثم <b>«إضافة»</b>.</li></ol>`
+    : `<ol class="install-steps"><li>افتح قائمة المتصفح <b>⋮</b> أو <b>…</b>.</li><li>اختر <b>«تثبيت التطبيق»</b> أو <b>«تثبيت رابطي»</b>.</li><li>أكّد التثبيت.</li></ol>
+       <p class="hint" style="margin:12px 0 0;color:var(--muted);font-size:12.5px">إن لم يظهر الخيار، استخدم Chrome أو Edge على الحاسوب، أو Chrome على Android.</p>`;
+  modal({
+    title: 'تثبيت رابطي على جهازك',
+    sub: ios ? 'من Safari، بدون متجر تطبيقات' : 'كتطبيق مستقل يعمل من أيقونته',
+    body: `<p style="margin:0 0 10px;color:var(--muted);font-size:14px;line-height:1.8">${ios ? 'التثبيت على iPhone وiPad يتم من خلال Safari:' : 'التثبيت يتم من قائمة المتصفح:'}</p>${steps}`,
+    foot: '<button class="btn primary" data-close>حسنًا</button>'
+  });
+}
+
+async function installApp() {
+  if (installPrompt) {
+    const prompt = installPrompt;
+    installPrompt = null;
+    try {
+      prompt.prompt();
+      const { outcome } = await prompt.userChoice;
+      if (outcome === 'accepted') appInstalled = true;
+    } catch {
+      installHelp();
+    }
+    syncInstall();
+    return;
+  }
+  installHelp();
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  installPrompt = e;
+  syncInstall();
+});
+window.addEventListener('appinstalled', () => {
+  appInstalled = true;
+  installPrompt = null;
+  syncInstall();
+  toast('تم تثبيت رابطي على جهازك', 'ok');
+});
+const standaloneQuery = window.matchMedia ? window.matchMedia('(display-mode: standalone)') : null;
+if (standaloneQuery) {
+  if (standaloneQuery.addEventListener) standaloneQuery.addEventListener('change', syncInstall);
+  else standaloneQuery.addListener?.(syncInstall);
+}
+
 /* ============================== global events ============================== */
 document.addEventListener('click', async (e) => {
   const nav = e.target.closest('[data-nav]');
@@ -869,6 +935,7 @@ document.addEventListener('click', async (e) => {
   const act = btn.dataset.act;
   if (act === 'menu') return toggleSidebar();
   if (act === 'menu-close') return closeSidebar();
+  if (act === 'install-app') return installApp();
   if (act === 'command') return openCommand();
   if (act === 'publish') return publishNow(btn);
   if (act === 'open-store') { if (btn.tagName !== 'A') ctx.openStore(); return; }
