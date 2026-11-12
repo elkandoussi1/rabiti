@@ -37,14 +37,15 @@ const state = {
 /* ---------- i18n ---------- */
 const STR = {
   ar: {
-    store: 'المتجر', search: 'ابحث عن منتج…', all: 'الكل', products: 'المنتجات', links: 'تابعني',
+    store: 'المتجر', search: 'ابحث عن منتج…', clearSearch: 'مسح البحث', all: 'الكل', products: 'المنتجات', links: 'تابعني',
+    storeWelcome: 'تصفح المنتجات الرقمية وأتمم طلبك بأمان.',
     add: 'أضف للسلة', buy: 'اشترِ الآن', open: 'فتح الرابط', download: 'تحميل', details: 'التفاصيل',
     free: 'مجاني', cart: 'السلة', cartEmpty: 'سلتك فارغة', cartEmptyText: 'أضف منتجًا رقميًا لتبدأ.',
     browse: 'تصفح المنتجات', subtotal: 'المجموع', discount: 'الخصم', total: 'الإجمالي', checkout: 'إتمام الشراء',
     continue: 'متابعة التسوق', coupon: 'كود الخصم', apply: 'تطبيق', remove: 'إزالة', qty: 'الكمية',
     customer: 'بياناتك', name: 'الاسم الكامل', email: 'البريد الإلكتروني', phone: 'الهاتف (اختياري)',
     payment: 'طريقة الدفع', note: 'ملاحظة', placeOrder: 'تأكيد الطلب', processing: 'جارٍ المعالجة…',
-    secure: 'دفع آمن · تسليم رقمي فوري', summary: 'ملخص الطلب', yourOrder: 'طلبك', orderNo: 'رقم الطلب',
+    secure: 'دفع آمن · تسليم رقمي فوري', trustPay: 'دفع آمن', trustInstant: 'تسليم فوري', summary: 'ملخص الطلب', yourOrder: 'طلبك', orderNo: 'رقم الطلب',
     status: 'الحالة', date: 'التاريخ', items: 'المنتجات', instructions: 'تعليمات الدفع', claim: 'أبلغت عن الدفع',
     claimRef: 'مرجع التحويل أو ملاحظة', claimSent: 'وصلنا إشعارك. سنؤكد الدفع قريبًا.', downloads: 'تحميلاتك',
     attachReceipt: 'إرفاق إيصال الدفع', receiptHint: 'اختياري · صورة أو PDF حتى 5 م.ب',
@@ -86,14 +87,15 @@ const STR = {
     backToCart: 'العودة للسلة', noProductsShort: 'لا منتجات', categoryAll: 'كل المنتجات', sort: 'ترتيب'
   },
   en: {
-    store: 'Store', search: 'Search products…', all: 'All', products: 'Products', links: 'Follow me',
+    store: 'Store', search: 'Search products…', clearSearch: 'Clear search', all: 'All', products: 'Products', links: 'Follow me',
+    storeWelcome: 'Browse the digital products and check out securely.',
     add: 'Add to cart', buy: 'Buy now', open: 'Open link', download: 'Download', details: 'Details',
     free: 'Free', cart: 'Cart', cartEmpty: 'Your cart is empty', cartEmptyText: 'Add a digital product to get started.',
     browse: 'Browse products', subtotal: 'Subtotal', discount: 'Discount', total: 'Total', checkout: 'Checkout',
     continue: 'Continue shopping', coupon: 'Coupon code', apply: 'Apply', remove: 'Remove', qty: 'Qty',
     customer: 'Your details', name: 'Full name', email: 'Email', phone: 'Phone (optional)',
     payment: 'Payment method', note: 'Note', placeOrder: 'Place order', processing: 'Processing…',
-    secure: 'Secure payment · instant digital delivery', summary: 'Order summary', yourOrder: 'Your order', orderNo: 'Order no.',
+    secure: 'Secure payment · instant digital delivery', trustPay: 'Secure payment', trustInstant: 'Instant delivery', summary: 'Order summary', yourOrder: 'Your order', orderNo: 'Order no.',
     status: 'Status', date: 'Date', items: 'Items', instructions: 'Payment instructions', claim: 'I have paid',
     claimRef: 'Transfer reference or note', claimSent: 'We received your note. We will confirm shortly.', downloads: 'Your downloads',
     attachReceipt: 'Attach payment receipt', receiptHint: 'Optional · image or PDF up to 5 MB',
@@ -135,14 +137,15 @@ const STR = {
     backToCart: 'Back to cart', noProductsShort: 'No products', categoryAll: 'All products', sort: 'Sort'
   },
   fr: {
-    store: 'Boutique', search: 'Rechercher un produit…', all: 'Tout', products: 'Produits', links: 'Suivez-moi',
+    store: 'Boutique', search: 'Rechercher un produit…', clearSearch: 'Effacer la recherche', all: 'Tout', products: 'Produits', links: 'Suivez-moi',
+    storeWelcome: 'Parcourez les produits numériques et commandez en toute sécurité.',
     add: 'Ajouter au panier', buy: 'Acheter', open: 'Ouvrir le lien', download: 'Télécharger', details: 'Détails',
     free: 'Gratuit', cart: 'Panier', cartEmpty: 'Votre panier est vide', cartEmptyText: 'Ajoutez un produit numérique pour commencer.',
     browse: 'Voir les produits', subtotal: 'Sous-total', discount: 'Remise', total: 'Total', checkout: 'Commander',
     continue: 'Continuer mes achats', coupon: 'Code promo', apply: 'Appliquer', remove: 'Retirer', qty: 'Qté',
     customer: 'Vos informations', name: 'Nom complet', email: 'E-mail', phone: 'Téléphone (optionnel)',
     payment: 'Moyen de paiement', note: 'Note', placeOrder: 'Confirmer la commande', processing: 'Traitement…',
-    secure: 'Paiement sécurisé · livraison numérique immédiate', summary: 'Récapitulatif', yourOrder: 'Votre commande', orderNo: 'N° de commande',
+    secure: 'Paiement sécurisé · livraison numérique immédiate', trustPay: 'Paiement sécurisé', trustInstant: 'Livraison immédiate', summary: 'Récapitulatif', yourOrder: 'Votre commande', orderNo: 'N° de commande',
     status: 'Statut', date: 'Date', items: 'Articles', instructions: 'Instructions de paiement', claim: "J'ai payé",
     claimRef: 'Référence du virement ou note', claimSent: 'Nous avons reçu votre note. Confirmation en cours.', downloads: 'Vos téléchargements',
     attachReceipt: 'Joindre le reçu', receiptHint: 'Facultatif · image ou PDF jusqu’à 5 Mo',
@@ -188,6 +191,14 @@ const t = (k) => STR[state.lang]?.[k] || STR.en[k] || k;
 
 /* ---------- helpers ---------- */
 const root = () => document.getElementById('store-root');
+/* The first paint is the centred loading box; drop that class before the
+ * store markup goes in, or every section inherits its grid and shrink-wraps. */
+function setRoot(html) {
+  const el = root();
+  if (!el) return;
+  el.classList.remove('s-loading');
+  el.innerHTML = html;
+}
 const cur = () => state.payload?.shop?.currency || 'MAD';
 const products = () => (state.payload?.products || []).filter((p) => p && p.id);
 const payMethods = () => (state.payload?.pay || []).filter((m) => m && m.t);
@@ -201,6 +212,18 @@ const linkHref = (u) => {
   if (/^https:\/\//i.test(s) || /^mailto:/i.test(s) || /^tel:/i.test(s)) return s;
   return '#';
 };
+/* A saved link can be an empty placeholder ("https://"). Keep those out of the
+ * storefront instead of painting a card that leads nowhere. */
+function isStoreLink(u) {
+  const s = String(u || '').trim();
+  if (/^mailto:/i.test(s)) return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.slice(7));
+  if (/^tel:/i.test(s)) return s.replace(/[^0-9]/g, '').length >= 4;
+  try {
+    const x = new URL(s);
+    return x.protocol === 'https:' && !!x.hostname && x.hostname.includes('.');
+  } catch { return false; }
+}
+const storeLinks = () => (state.payload?.links || []).filter((l) => l && isStoreLink(l.u));
 const fmt = (iso) => state.lang === 'ar' ? fmtDate(iso, 'ar') : state.lang === 'fr' ? fmtDate(iso, 'fr') : fmtDate(iso, 'en');
 const fmtTime = (iso) => state.lang === 'ar' ? fmtDateTime(iso, 'ar') : state.lang === 'fr' ? fmtDateTime(iso, 'fr') : fmtDateTime(iso, 'en');
 const priceOf = (p) => priceToMinor(p.pr);
@@ -340,24 +363,29 @@ function topbar() {
 function hero() {
   const p = state.payload; const d = p.design || {};
   const name = p.profile?.name || 'المتجر';
-  const links = (p.links || []).filter((l) => ['whatsapp', 'telegram', 'instagram', 'facebook', 'tiktok', 'youtube', 'email', 'phone'].includes(l.icon || platformIcon(l.u))).slice(0, 5);
-  return `<section class="s-hero"><div class="wrap s-hero-in ${d.hero === 'centered' ? 'centered' : ''}">
-    <div class="s-avatar">${p.profile?.avatar ? `<img src="${attr(imgSrc(p.profile.avatar))}" alt="${attr(name)}">` : esc(initials(name))}</div>
-    <div><h1>${esc(name)}</h1>${p.profile?.bio ? `<p class="bio">${esc(p.profile.bio)}</p>` : ''}${p.profile?.location ? `<div class="loc">${icon('pin', 'sm')} ${esc(p.profile.location)}</div>` : ''}
-      ${links.length ? `<div class="s-socials">${links.map((l) => `<a href="${attr(linkHref(l.u))}" target="_blank" rel="noopener" data-s-track="link" data-id="${attr(l.id)}">${icon(PLAT[l.icon] || platformIcon(l.u) || 'globe', 'sm')} ${esc(l.t || platformName(l.u))}</a>`).join('')}</div>` : ''}
+  const links = storeLinks().filter((l) => ['whatsapp', 'telegram', 'instagram', 'facebook', 'tiktok', 'youtube', 'email', 'phone'].includes(l.icon || platformIcon(l.u))).slice(0, 5);
+  const count = products().length;
+  return `<section class="s-hero"><div class="wrap"><div class="s-hero-card ${d.hero === 'centered' ? 'centered' : ''}">
+    <div class="s-hero-main">
+      <div class="s-avatar">${p.profile?.avatar ? `<img src="${attr(imgSrc(p.profile.avatar))}" alt="${attr(name)}">` : esc(initials(name))}</div>
+      <div class="s-hero-id"><h1>${esc(name)}</h1><p class="bio">${esc(p.profile?.bio || t('storeWelcome'))}</p>
+        ${(p.profile?.location || links.length) ? `<div class="s-hero-meta">${p.profile?.location ? `<span class="loc">${icon('pin', 'sm')} ${esc(p.profile.location)}</span>` : ''}${links.length ? `<div class="s-socials">${links.map((l) => `<a href="${attr(linkHref(l.u))}" target="_blank" rel="noopener" data-s-track="link" data-id="${attr(l.id)}" title="${attr(l.t || platformName(l.u))}">${icon(PLAT[l.icon] || platformIcon(l.u) || 'globe', 'sm')} ${esc(l.t || platformName(l.u))}</a>`).join('')}</div>` : ''}</div>` : ''}
+      </div>
+      <div class="s-trust">
+        ${count ? `<span class="s-trust-item">${icon('bag', 'sm')}<b>${count}</b> ${t('itemsShort')}</span>` : ''}
+        <span class="s-trust-item">${icon('shield', 'sm')} ${t('trustPay')}</span>
+        <span class="s-trust-item">${icon('zap', 'sm')} ${t('trustInstant')}</span>
+      </div>
     </div>
-    ${products().length ? `<div class="s-hero-side"><div class="s-stat-pill"><b>${products().length}</b><span>${t('products')}</span></div><div class="s-stat-pill"><b>${t('digital')}</b><span>${t('secure')}</span></div></div>` : ''}
-  </div></section>`;
+  </div></div></section>`;
 }
 
 function toolbar() {
   const cats = Array.from(new Set(products().map((p) => (p.category || '').trim()).filter(Boolean))).slice(0, 8);
-  const d = state.payload.design || {};
   return `<div class="s-toolbar"><div class="wrap s-toolbar-in">
-    <div class="s-search">${icon('search')}<input id="store-search" placeholder="${t('search')}" value="${attr(state.query)}" autocomplete="off"></div>
-    ${cats.length ? `<div class="s-cats"><button data-s-act="cat" data-cat="" class="${!state.category ? 'on' : ''}">${t('all')}</button>${cats.map((c) => `<button data-s-act="cat" data-cat="${attr(c)}" class="${state.category === c ? 'on' : ''}">${esc(c)}</button>`).join('')}</div>` : ''}
-    <div class="spacer"></div>
-    <div class="s-view-toggle"><button data-s-act="layout" data-layout="grid" class="${state.layout !== 'list' ? 'on' : ''}" title="${t('grid')}">${icon('grid')}</button><button data-s-act="layout" data-layout="list" class="${state.layout === 'list' ? 'on' : ''}" title="${t('list')}">${icon('list')}</button></div>
+    <div class="s-search">${icon('search')}<input id="store-search" type="text" enterkeyhint="search" placeholder="${t('search')}" value="${attr(state.query)}" autocomplete="off" aria-label="${attr(t('search'))}"><button type="button" class="s-search-x ${state.query ? '' : 'hidden'}" data-s-act="search-clear" aria-label="${attr(t('clearSearch'))}" title="${attr(t('clearSearch'))}">${icon('x', 'sm')}</button></div>
+    ${cats.length ? `<div class="s-cats" role="group" aria-label="${attr(t('categories'))}"><button data-s-act="cat" data-cat="" class="${!state.category ? 'on' : ''}">${t('all')}</button>${cats.map((c) => `<button data-s-act="cat" data-cat="${attr(c)}" class="${state.category === c ? 'on' : ''}">${esc(c)}</button>`).join('')}</div>` : ''}
+    <div class="s-view-toggle" role="group" aria-label="${attr(t('view'))}"><button data-s-act="layout" data-layout="grid" class="${state.layout !== 'list' ? 'on' : ''}" title="${t('grid')}" aria-label="${t('grid')}">${icon('grid')}</button><button data-s-act="layout" data-layout="list" class="${state.layout === 'list' ? 'on' : ''}" title="${t('list')}" aria-label="${t('list')}">${icon('list')}</button></div>
   </div></div>`;
 }
 
@@ -369,8 +397,8 @@ function productCard(p) {
   return `<article class="s-card" data-product="${attr(p.id)}">
     <div class="s-media" data-s-act="open" data-id="${attr(p.id)}">${im ? `<img src="${attr(im)}" alt="${attr(p.t)}" loading="lazy">` : `<div class="placeholder">${icon('image')}</div>`}${badge ? `<span class="s-badge ${sale(p) ? 'sale' : ''}">${esc(badge)}</span>` : ''}${type}</div>
     <div class="s-body">${p.category ? `<div class="s-cat">${esc(p.category)}</div>` : ''}<h3 class="s-title" data-s-act="open" data-id="${attr(p.id)}" style="cursor:pointer">${esc(p.t || t('product'))}</h3>${d.desc ? `<p class="s-desc">${esc(p.d || '')}</p>` : ''}
-      <div class="s-price-row">${d.price === 0 ? '' : p.mode === 'paid' ? `<span class="s-price">${money(priceOf(p), pcur(p), state.lang)}</span>${sale(p) ? `<span class="s-compare">${money(priceToMinor(p.compareAt), pcur(p), state.lang)}</span>` : ''}` : `<span class="s-free">${t('free')}</span>`}</div>
-      <div class="s-actions">${p.mode === 'paid' ? `<button class="s-btn fill" data-s-act="add" data-id="${attr(p.id)}">${icon('cart', 'sm')} ${t('add')}</button><button class="s-btn" data-s-act="buy" data-id="${attr(p.id)}">${t('buy')}</button>` : p.mode === 'link' ? `<a class="s-btn fill" href="${attr(linkHref(p.link))}" target="_blank" rel="noopener" data-s-track="link" data-id="${attr(p.id)}">${icon('external', 'sm')} ${t('open')}</a>` : p.mode === 'file' ? `<button class="s-btn fill" data-s-act="free-download" data-id="${attr(p.id)}">${icon('download', 'sm')} ${t('download')}</button>` : `<button class="s-btn" data-s-act="open" data-id="${attr(p.id)}">${t('details')}</button>`}</div>
+      <div class="s-buy"><div class="s-price-row">${d.price === 0 ? '' : p.mode === 'paid' ? `<span class="s-price">${money(priceOf(p), pcur(p), state.lang)}</span>${sale(p) ? `<span class="s-compare">${money(priceToMinor(p.compareAt), pcur(p), state.lang)}</span>` : ''}` : `<span class="s-free">${t('free')}</span>`}</div>
+      <div class="s-actions">${p.mode === 'paid' ? `<button class="s-btn fill" data-s-act="add" data-id="${attr(p.id)}">${icon('cart', 'sm')} ${t('add')}</button><button class="s-btn" data-s-act="buy" data-id="${attr(p.id)}">${t('buy')}</button>` : p.mode === 'link' ? `<a class="s-btn fill" href="${attr(linkHref(p.link))}" target="_blank" rel="noopener" data-s-track="link" data-id="${attr(p.id)}">${icon('external', 'sm')} ${t('open')}</a>` : p.mode === 'file' ? `<button class="s-btn fill" data-s-act="free-download" data-id="${attr(p.id)}">${icon('download', 'sm')} ${t('download')}</button>` : `<button class="s-btn" data-s-act="open" data-id="${attr(p.id)}">${t('details')}</button>`}</div></div>
     </div></article>`;
 }
 
@@ -389,21 +417,20 @@ function gridHTML() {
 }
 
 function linksBlock() {
-  const links = state.payload.links || [];
+  const links = storeLinks();
   if (!links.length) return '';
-  return `<section class="s-links"><div class="wrap"><div class="s-sec-head"><div><h2>${t('links')}</h2><p>${t('social')}</p></div></div><div class="s-links-grid">${links.map((l) => `<a class="s-link" href="${attr(linkHref(l.u))}" target="_blank" rel="noopener" data-s-track="link" data-id="${attr(l.id)}"><span class="ic-tile">${icon(PLAT[l.icon] || platformIcon(l.u) || 'globe')}</span><span style="min-width:0"><b>${esc(l.t || platformName(l.u))}</b><span>${esc(hostLabel(l.u))}</span></span><span class="arrow">${icon('arrow-up-right', 'sm')}</span></a>`).join('')}</div></div></section>`;
+  return `<section class="s-links"><div class="wrap"><div class="s-sec-head"><div class="s-sec-title"><h2>${t('links')}</h2></div><p class="s-sec-sub">${t('social')}</p></div><div class="s-links-grid">${links.map((l) => `<a class="s-link" href="${attr(linkHref(l.u))}" target="_blank" rel="noopener" data-s-track="link" data-id="${attr(l.id)}"><span class="ic-tile">${icon(PLAT[l.icon] || platformIcon(l.u) || 'globe')}</span><span class="l-body"><b>${esc(l.t || platformName(l.u))}</b><span class="host">${esc(hostLabel(l.u))}</span></span><span class="arrow">${icon('arrow-up-right', 'sm')}</span></a>`).join('')}</div></div></section>`;
 }
 
 function footer() {
   const p = state.payload; const d = p.design || {};
   const name = p.profile?.name || '';
   const year = new Date().getFullYear();
-  return `<footer class="s-foot"><div class="wrap"><div class="s-foot-in"><div>${d.footerOn ? esc(d.footer || `© ${year} ${name} — ${t('store')}`) : `© ${year} ${name}`}</div><div class="row" style="gap:14px">${p.shop?.terms ? `<button class="s-btn ghost" data-s-act="terms" style="border:0;background:none;padding:0;font-size:10.5px;color:var(--s-muted)">${t('terms')}</button>` : ''}<a class="made" href="index.html" target="_blank" rel="noopener"><span class="mark">R</span>${t('powered')} ${t('store') === 'Store' ? 'Rabiti' : 'رابطي'}</a></div></div><div class="s-pay-note">${icon('lock', 'sm')} ${t('secure')}</div></div></footer>`;
+  return `<footer class="s-foot"><div class="wrap"><div class="s-foot-in"><div>${d.footerOn ? esc(d.footer || `© ${year} ${name} — ${t('store')}`) : `© ${year} ${name}`}</div><div class="row" style="gap:14px">${p.shop?.terms ? `<button class="s-btn ghost" data-s-act="terms" style="border:0;background:none;padding:0;font-size:10.5px;color:var(--s-muted)">${t('terms')}</button>` : ''}<a class="made" href="index.html" target="_blank" rel="noopener"><span class="mark">R</span>${t('powered')} ${state.lang === 'ar' ? 'رابطي' : 'Rabiti'}</a></div></div><div class="s-pay-note">${icon('lock', 'sm')} ${t('secure')}</div></div></footer>`;
 }
 
 function homeHTML() {
-  const d = state.payload.design || {};
-  return `${topbar()}${hero()}${toolbar()}<section class="s-section"><div class="wrap"><div class="s-sec-head"><div><h2>${t('products')}</h2><p>${state.category ? esc(state.category) : t('allProducts')}</p></div><span class="s-count" id="products-count">${products().length} ${t('itemsShort')}</span></div><div id="products-wrap">${gridHTML()}</div></div></section>${linksBlock()}${footer()}<button class="s-cart-fab" data-s-act="cart-open" ${cartCount() ? '' : 'style="display:none"'}>${icon('bag')} ${t('cart')} <span class="count" data-cart-count>${cartCount()}</span></button>`;
+  return `${topbar()}${hero()}${toolbar()}<section class="s-section" id="products"><div class="wrap"><div class="s-sec-head"><div class="s-sec-title"><h2>${t('products')}</h2><span class="s-count" id="products-count">${visibleProducts().length} ${t('itemsShort')}</span></div><p class="s-sec-sub" id="products-sub">${state.category ? esc(state.category) : t('allProducts')}</p></div><div id="products-wrap">${gridHTML()}</div></div></section>${linksBlock()}${footer()}<button class="s-cart-fab" data-s-act="cart-open" ${cartCount() ? '' : 'style="display:none"'}>${icon('bag')} ${t('cart')} <span class="count" data-cart-count>${cartCount()}</span></button>`;
 }
 
 /* ---------- product modal ---------- */
@@ -675,7 +702,7 @@ function goOrder(order, replace = false) {
 async function renderRoute(scroll = false) {
   applyTheme();
   const html = state.page === 'checkout' ? checkoutHTML() : state.page === 'order' ? await orderHTML() : homeHTML();
-  root().innerHTML = html;
+  setRoot(html);
   if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
   if (state.page === 'order') { startPolling(); if (state.paidFlag) { state.paidFlag = false; setTimeout(async () => { await loadOrder(); renderRoute(); }, 2500); } }
 }
@@ -707,7 +734,7 @@ async function boot() {
 }
 
 function renderError(title, text) {
-  root().innerHTML = `<div class="s-error"><div class="box"><div class="ill">${icon('alert', 'lg')}</div><h1>${esc(title)}</h1><p>${esc(text)}</p><a class="s-btn fill" href="index.html" style="display:inline-flex;padding:10px 16px">${t('store')}</a></div></div>`;
+  setRoot(`<div class="s-error"><div class="box"><div class="ill">${icon('alert', 'lg')}</div><h1>${esc(title)}</h1><p>${esc(text)}</p><a class="s-btn fill" href="index.html" style="display:inline-flex;padding:10px 16px">${t('store')}</a></div></div>`);
 }
 
 /* ---------- helpers for links ---------- */
@@ -749,6 +776,13 @@ document.addEventListener('click', async (e) => {
   if (act === 'coupon-apply') { await applyCoupon($('#coupon-input')?.value, '#coupon-input'); return; }
   if (act === 'co-coupon') { await applyCoupon($('#co-coupon')?.value, '#co-coupon'); return; }
   if (act === 'coupon-remove') { state.coupon = null; state.couponData = null; if (state.cartOpen) renderCartDrawer(); if (state.page === 'checkout') renderRoute(); return; }
+  if (act === 'search-clear') {
+    state.query = '';
+    const input = document.getElementById('store-search');
+    if (input) { input.value = ''; input.focus(); }
+    updateGrid();
+    return;
+  }
   if (act === 'cat') { state.category = btn.dataset.cat || ''; $$('.s-cats button').forEach((b) => b.classList.toggle('on', b.dataset.cat === state.category)); updateGrid(); return; }
   if (act === 'layout') { state.layout = btn.dataset.layout; $$('.s-view-toggle button').forEach((b) => b.classList.toggle('on', b.dataset.layout === state.layout)); updateGrid(); return; }
   if (act === 'lang') { setLang(btn.dataset.lang); return; }
@@ -760,7 +794,12 @@ document.addEventListener('click', async (e) => {
   if (act === 'download-file') { api.track(state.slug, 'link_click', '', location.pathname, state.visitor, document.referrer).catch(() => {}); return; }
 });
 document.addEventListener('input', (e) => {
-  if (e.target.id === 'store-search') { state.query = e.target.value; updateGrid(); }
+  if (e.target.id === 'store-search') {
+    state.query = e.target.value;
+    const clear = document.querySelector('.s-search-x');
+    if (clear) clear.classList.toggle('hidden', !state.query);
+    updateGrid();
+  }
 });
 document.addEventListener('change', (e) => {
   if (e.target.name === 'co-method') state.checkoutMethod = e.target.value;
@@ -831,6 +870,10 @@ function updateGrid() {
   if (wrap) wrap.innerHTML = gridHTML();
   const count = document.getElementById('products-count');
   if (count) count.textContent = `${visibleProducts().length} ${t('itemsShort')}`;
+  const sub = document.getElementById('products-sub');
+  if (sub) sub.textContent = state.category || t('allProducts');
+  const clear = document.querySelector('.s-search-x');
+  if (clear) clear.classList.toggle('hidden', !state.query);
 }
 function setLang(l) {
   if (!['ar', 'en', 'fr'].includes(l)) return;
